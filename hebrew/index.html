@@ -1,0 +1,2577 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <title>פלטפורמת ניטור סכסוכים ברמת מחקר — אפיסטמולוגיה × אינפורמטיקה לשלום</title>
+  <style>
+    /* =========================================================
+       RESEARCH PLATFORM: PhD-Grade Visual System
+       Theory: Information hierarchies must be visually distinguishable.
+       Method: Token-based theming + clear semantic layers.
+       Expected outcome: Cognitive load reduction for complex analysis.
+    ========================================================== */
+    :root{
+      --bg0:#070A12; --bg1:#0C1222; --card:#0F1A2E; --card2:#0B1426;
+      --txt:#EAF1FF; --muted:#A9B7D6; --faint:#7C89A6;
+      --accent:#7CF7C5; --accent2:#86B7FF; --warn:#FFD27D; --bad:#FF7D9B; --good:#7DFFB2;
+      --purple:#D4A5FF; --orange:#FFAB70;
+      --line:rgba(255,255,255,.12); --shadow: 0 16px 50px rgba(0,0,0,.45);
+      --radius: 18px; --radius2: 26px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box; margin:0; padding:0}
+    html,body{height:100%}
+    body{
+      font-family:var(--sans); color:var(--txt);
+      background: radial-gradient(1200px 700px at 20% 10%, rgba(134,183,255,.18), transparent 55%),
+                  radial-gradient(900px 600px at 80% 20%, rgba(124,247,197,.12), transparent 50%),
+                  linear-gradient(180deg,var(--bg0),var(--bg1));
+      overflow-x:hidden;
+    }
+    a{color:var(--accent2); text-decoration:none}
+    a:hover{text-decoration:underline}
+    code,pre{font-family:var(--mono); font-size:13px; direction:ltr; text-align:left}
+    pre{
+      background:rgba(0,0,0,.3); border:1px solid var(--line); border-radius:12px;
+      padding:10px 12px; overflow-x:auto; line-height:1.4;
+    }
+    .wrap{max-width:1400px; margin:0 auto; padding:18px 16px 70px}
+    .row{display:flex; gap:14px; flex-wrap:wrap}
+    .col{flex:1 1 320px}
+    .col2{flex:1 1 480px}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line); border-radius:var(--radius);
+      box-shadow:var(--shadow); backdrop-filter: blur(8px); overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px; border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    }
+    .card .bd{padding:14px; line-height:1.5}
+    .pill{
+      border:1px solid var(--line); border-radius:999px; padding:6px 10px; font-size:12px;
+      color:var(--muted); background: rgba(0,0,0,.18);
+      display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
+    }
+    .pill b{color:var(--txt); font-weight:650}
+    .btn{
+      appearance:none; border:1px solid var(--line); background: rgba(0,0,0,.20);
+      color:var(--txt); padding:10px 12px; border-radius:14px; cursor:pointer;
+      transition: transform .06s ease, border-color .2s, background .2s; font-weight:650; font-size:13px;
+    }
+    .btn:hover{border-color:rgba(255,255,255,.24); background: rgba(0,0,0,.28)}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{border-color: rgba(124,247,197,.35); background: rgba(124,247,197,.14)}
+    .btn.primary:hover{border-color: rgba(124,247,197,.55); background: rgba(124,247,197,.18)}
+    .btn.danger{border-color: rgba(255,125,155,.38); background: rgba(255,125,155,.14)}
+    .btn.small{padding:7px 10px; border-radius:12px; font-size:12px}
+    .muted{color:var(--muted)}
+    .faint{color:var(--faint)}
+    h1,h2,h3,h4{margin:0; line-height:1.2}
+    h1{font-size:24px; letter-spacing:.2px}
+    h2{font-size:18px; font-weight:800}
+    h3{font-size:15px; font-weight:750}
+    h4{font-size:14px; font-weight:700}
+    .k{font-family:var(--mono); font-size:12px; color:var(--muted); direction:ltr; text-align:left}
+    .sep{height:1px; background:var(--line); margin:12px 0}
+    .grid2{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+    .grid3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px}
+    .grid4{display:grid; grid-template-columns: repeat(4, 1fr); gap:12px}
+    @media (max-width: 1100px){.grid3,.grid4{grid-template-columns:1fr 1fr}}
+    @media (max-width: 700px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+    input,select,textarea{
+      width:100%; border-radius:14px; border:1px solid var(--line);
+      background: rgba(0,0,0,.22); color:var(--txt); padding:10px 12px; outline:none; font-size:13px;
+    }
+    textarea{min-height:96px; resize:vertical; font-family:var(--mono); direction:rtl}
+    label{display:block; font-size:12px; color:var(--muted); margin:8px 0 6px; font-weight:600}
+    .tiny{font-size:12px; line-height:1.45}
+    .tag{
+      display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px;
+      border:1px solid var(--line); background: rgba(0,0,0,.22);
+      font-size:11px; color:var(--muted); margin:3px 6px 3px 0; font-weight:600;
+    }
+    .tag.good{border-color: rgba(125,255,178,.35); color: var(--good); background:rgba(125,255,178,.08)}
+    .tag.warn{border-color: rgba(255,210,125,.35); color: var(--warn); background:rgba(255,210,125,.08)}
+    .tag.bad{border-color: rgba(255,125,155,.35); color: var(--bad); background:rgba(255,125,155,.08)}
+    .tag.purple{border-color: rgba(212,165,255,.35); color: var(--purple); background:rgba(212,165,255,.08)}
+    .tag.orange{border-color: rgba(255,171,112,.35); color: var(--orange); background:rgba(255,171,112,.08)}
+    .mono{font-family:var(--mono); direction:ltr; text-align:left}
+    .right{display:flex; gap:10px; align-items:center; justify-content:flex-start; flex-wrap:wrap}
+
+    /* Sticky nav */
+    .topbar{
+      position:sticky; top:0; z-index:30;
+      background: linear-gradient(180deg, rgba(7,10,18,.92), rgba(7,10,18,.58));
+      border-bottom:1px solid var(--line); backdrop-filter: blur(10px);
+    }
+    .topbar .inner{
+      max-width:1400px; margin:0 auto; padding:10px 16px;
+      display:flex; align-items:center; gap:12px; justify-content:space-between; flex-wrap:wrap;
+    }
+    .brand{display:flex; align-items:center; gap:10px; min-width: 280px}
+    .logo{
+      width:36px; height:36px; border-radius:12px;
+      background: radial-gradient(circle at 30% 30%, rgba(124,247,197,.9), rgba(134,183,255,.35) 40%, transparent 70%),
+                  linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.16); box-shadow: 0 12px 26px rgba(0,0,0,.45);
+      position:relative; overflow:hidden;
+    }
+    .logo::after{
+      content:""; position:absolute; inset:-20px;
+      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,.18), transparent 55%);
+      transform: rotate(20deg);
+    }
+    .nav{display:flex; gap:6px; flex-wrap:wrap; justify-content:center}
+    .nav a{
+      font-size:11px; color:var(--muted); padding:7px 9px;
+      border:1px solid transparent; border-radius:999px; font-weight:600;
+    }
+    .nav a:hover{color:var(--txt); border-color: var(--line); background: rgba(0,0,0,.2); text-decoration:none}
+    .searchBox{min-width:240px; max-width:340px; width:30vw}
+    .searchBox input{padding:9px 12px; border-radius:999px}
+
+    /* Hero parallax */
+    .hero{
+      position:relative; border-radius: var(--radius2); overflow:hidden;
+      border:1px solid var(--line); box-shadow: var(--shadow); margin-top:16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    }
+    .hero .bg{
+      position:absolute; inset:-60px;
+      background: radial-gradient(800px 380px at 20% 20%, rgba(134,183,255,.22), transparent 60%),
+                  radial-gradient(700px 360px at 80% 40%, rgba(124,247,197,.16), transparent 60%),
+                  radial-gradient(420px 280px at 55% 85%, rgba(255,210,125,.12), transparent 60%);
+      transform: translate3d(var(--px,0), var(--py,0), 0) scale(1.02); filter: saturate(1.05);
+    }
+    .hero .fg{position:relative; padding:18px 16px 14px}
+    .hero .title{display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap}
+    .hero p{margin:8px 0 0; color:var(--muted); max-width: 90ch; line-height:1.5}
+    .hero .badges{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-start}
+
+    /* Splash */
+    .splash{
+      position:fixed; inset:0; z-index:100;
+      background: radial-gradient(1100px 700px at 20% 10%, rgba(134,183,255,.25), transparent 55%),
+                  radial-gradient(900px 600px at 80% 30%, rgba(124,247,197,.18), transparent 55%),
+                  linear-gradient(180deg, #060911, #0A1020);
+      display:flex; align-items:center; justify-content:center;
+      transition: opacity .5s ease, transform .5s ease;
+    }
+    .splash.hide{opacity:0; pointer-events:none; transform: translateY(-8px)}
+    .splash .panel{
+      width:min(820px, 92vw); border-radius: 28px; border:1px solid rgba(255,255,255,.14);
+      background: rgba(10,14,24,.65); backdrop-filter: blur(12px);
+      box-shadow: 0 24px 90px rgba(0,0,0,.6); overflow:hidden;
+    }
+    .splash .panel .in{padding:20px 20px 18px}
+    .splash .big{font-size:24px; font-weight:900; letter-spacing:.2px; line-height:1.2}
+    .splash .sub{margin-top:10px; color:var(--muted); line-height:1.5}
+    .splash .bar{
+      height:10px; border-radius:999px; border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06); overflow:hidden; margin-top:14px;
+    }
+    .splash .bar i{
+      display:block; height:100%; width: 0%;
+      background: linear-gradient(90deg, rgba(124,247,197,.95), rgba(134,183,255,.95));
+      animation: loadbar 1.4s ease forwards;
+    }
+    @keyframes loadbar{to { width: 100% }}
+
+    /* Research tabs */
+    .tabs{display:flex; gap:6px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:10px}
+    .tabs button{
+      background:transparent; border:1px solid transparent; color:var(--muted);
+      padding:8px 12px; border-radius:12px; cursor:pointer; font-weight:650; font-size:12px;
+    }
+    .tabs button:hover{background:rgba(0,0,0,.2); color:var(--txt)}
+    .tabs button.active{border-color:var(--accent); color:var(--accent); background:rgba(124,247,197,.08)}
+    .tabContent{display:none; padding-top:14px}
+    .tabContent.active{display:block}
+
+    /* Event list */
+    .elist{display:flex; flex-direction:column; gap:10px}
+    .ev{
+      border:1px solid var(--line); border-radius: 16px; background: rgba(0,0,0,.14); padding:10px 12px;
+    }
+    .ev .top{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap}
+    .ev .ttl{font-weight:800; line-height:1.25; font-size:15px}
+    .ev .meta{font-size:12px; color:var(--muted); margin-top:6px}
+    .ev .srcs{margin-top:8px}
+    .ev .desc{margin-top:8px; color:var(--muted); line-height:1.4; font-size:13px}
+    .ev .links{margin-top:8px; display:flex; gap:8px; flex-wrap:wrap}
+    .ev .score{font-family:var(--mono); font-size:12px; color:var(--muted); direction:ltr}
+    .ev .score b{color:var(--txt)}
+
+    /* Collapsibles */
+    details{
+      border-radius: 16px; border:1px solid var(--line); background: rgba(0,0,0,.12); overflow:hidden; margin:10px 0;
+    }
+    details summary{
+      cursor:pointer; padding:12px 14px; list-style:none;
+      display:flex; align-items:center; justify-content:space-between; gap:10px; font-weight:750;
+    }
+    details summary::-webkit-details-marker{display:none}
+    details .inside{padding:12px 14px; border-top:1px solid var(--line); color:var(--muted); line-height:1.5}
+    .badgeDot{width:9px; height:9px; border-radius:99px; background: var(--accent); box-shadow: 0 0 0 3px rgba(124,247,197,.16)}
+    .badgeDot.warn{background: var(--warn); box-shadow: 0 0 0 3px rgba(255,210,125,.18)}
+    .badgeDot.bad{background: var(--bad); box-shadow: 0 0 0 3px rgba(255,125,155,.18)}
+
+    /* Canvas viz */
+    .vizWrap{
+      border-radius: 18px; border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18); overflow:hidden; min-height:180px;
+    }
+    canvas{display:block; width:100%; height:auto}
+
+    /* HUD */
+    .hud{
+      position:fixed; left:14px; bottom:14px; z-index:50; width: 340px;
+      border-radius: 22px; border:1px solid rgba(255,255,255,.16);
+      background: rgba(10,14,24,.78); backdrop-filter: blur(10px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.55); overflow:hidden; user-select:none;
+    }
+    .hud .hhd{
+      padding:10px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .hud .hbd{padding:10px 12px}
+    .hud .meter{
+      height:10px; border-radius:999px; background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10); overflow:hidden;
+    }
+    .hud .meter > i{
+      display:block; height:100%; width: var(--w, 40%);
+      background: linear-gradient(90deg, rgba(124,247,197,.95), rgba(134,183,255,.95));
+    }
+    .hud .mini{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px}
+    .hud .box{
+      border:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.18);
+      border-radius: 16px; padding:9px 10px;
+    }
+    .hud .box .v{font-weight:800; font-size:16px}
+    .hud .box .t{font-size:11px; color:var(--muted)}
+    .hud .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .hud.min{height:48px}
+    .hud.min .hbd{display:none}
+
+    /* Footer */
+    footer{
+      margin-top:18px; padding:14px 16px; border-top:1px solid var(--line);
+      color:var(--muted); font-size:12px; line-height:1.5;
+    }
+
+    /* RTL adjustments */
+    ul, ol {
+      margin-right: 20px;
+      margin-left: 0;
+    }
+
+    /* Print */
+    @media print{
+      .topbar,.hud,.splash{display:none !important}
+      body{background:#fff !important; color:#000 !important}
+      .card, .hero{box-shadow:none !important; border-color:#bbb !important}
+      a{color:#000 !important; text-decoration:underline !important}
+    }
+  </style>
+</head>
+<body>
+  <!--
+    ZERO-HARM + ANTI-INVERSION COMMITMENT:
+    This platform is designed for research, education, and nonviolent peacebuilding.
+    All data remains local. No hidden telemetry. No auto-send. No coercion.
+    Adversarial testing is for defense, not offense. Participatory features respect consent and safety.
+  -->
+
+  <div id="splash" class="splash" aria-live="polite">
+    <div class="panel">
+      <div class="in">
+        <div class="big">פלטפורמת ניטור סכסוכים ברמת דוקטורט 🧭🔬</div>
+        <div class="sub">
+          זהו כלי מחקר לחקירת האפיסטמולוגיה של ידע על סכסוכים.
+          הוא מנתח נרטיבים ממקורות מרובים דרך שבע עדשות תיאורטיות: מיפוי אונטולוגי,
+          דינמיקה זמנית, מעקב מקור, מטריצות פעולה-ביטחון, עמידות אדברסרית,
+          אימות השתתפותי ותצפית על ביצועים.
+        </div>
+        <div class="sub tiny">
+          הכל פועל מקומית. IndexedDB לשמירה מתמשכת. Service Worker ליכולת לא-מקוונת.
+          אין תלויות חיצוניות. אין מעקב. ניתוח מקומי בלבד שבשליטתך.
+        </div>
+        <div class="bar" aria-label="מאתחל סביבת מחקר"><i></i></div>
+        <div class="right" style="margin-top:14px">
+          <button class="btn primary" id="enterBtn">כניסה לפלטפורמת המחקר</button>
+          <button class="btn" id="resetLocalBtn">איפוס כל הנתונים המקומיים</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div style="font-weight:900; line-height:1.1; font-size:13px">פלטפורמת ניטור סכסוכים ברמת מחקר</div>
+          <div class="tiny muted">אפיסטמולוגיה × אינפורמטיקה לשלום</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="תוכן עניינים">
+        <a href="#live">לוח בקרה</a>
+        <a href="#ontology">אונטולוגיה</a>
+        <a href="#temporal">זמני</a>
+        <a href="#provenance">מקור</a>
+        <a href="#action">פעולה</a>
+        <a href="#adversarial">צוות אדום</a>
+        <a href="#participatory">קהילה</a>
+        <a href="#performance">ביצועים</a>
+        <a href="#sources">מקורות</a>
+        <a href="#settings">הגדרות</a>
+      </nav>
+      <div class="searchBox">
+        <input id="search" type="search" placeholder="חיפוש אירועים, ניתוח דפוסים…" autocomplete="off" />
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" id="top">
+      <div class="bg" id="parallaxBg" aria-hidden="true"></div>
+      <div class="fg">
+        <div class="title">
+          <div>
+            <h1>ניתוח סכסוכים ממקורות מרובים עם קפדנות אפיסטמולוגית 🌍🛰️</h1>
+            <p>
+              פלטפורמה זו מתייחסת לחוסר התאמה במידע כאות מחקר מדרגה ראשונה. כאשר מקורות לא מסכימים,
+              היא לא שופטת - היא מנתחת את מבנה אי ההסכמה עצמה. שבעה מודולים אנליטיים
+              חוקרים ממדים שונים של הבעיה: אילו מסגרות רעיוניות מתנגשות
+              (אונטולוגיה), כיצד נרטיבים מתפתחים לאורך זמן (דינמיקה זמנית), האם מקורות באמת עצמאיים
+              (מקור), אילו ספי ביטחון מצדיקים אילו פעולות (יכולת פעולה), כיצד המערכת
+              מתפקדת תחת לחץ אדברסרי (עמידות), כיצד לכלול ידע קהילתי בבטחה
+              (השתתפותי), והיכן מגבלות חישוביות צצות (ביצועים).
+            </p>
+          </div>
+          <div class="badges">
+            <span class="pill" title="רענון נתונים מוצלח אחרון"><b>עדכון:</b> <span id="freshPill">—</span></span>
+            <span class="pill" title="סטיית נרטיב ממוצעת"><b>סטייה:</b> <span id="divPill">—</span></span>
+            <span class="pill" title="גיוון מסגרת אונטולוגית"><b>אונטולוגיות:</b> <span id="ontoPill">—</span></span>
+            <span class="pill" title="ציון עצמאות מקור"><b>עצמאות:</b> <span id="provPill">—</span></span>
+            <span class="pill" title="מצב מטמון"><b>מטמון:</b> <span id="cachePill">—</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="row" style="margin-top:14px">
+      <section class="col2 card" id="live">
+        <div class="hd">
+          <h2>לוח בקרה חי 🧪</h2>
+          <div class="right">
+            <button class="btn primary small" id="refreshBtn">רענן מקורות</button>
+            <button class="btn small" id="useCacheBtn">השתמש במטמון</button>
+            <button class="btn small" id="exportBtn">ייצא JSON</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="grid3">
+            <div>
+              <label for="region">אזור</label>
+              <select id="region">
+                <option value="world">עולם</option>
+                <option value="europe">אירופה</option>
+                <option value="mena">המזרח התיכון וצפון אפריקה</option>
+                <option value="ssa">אפריקה שמדרום לסהרה</option>
+                <option value="asia">אסיה-פסיפיק</option>
+                <option value="americas">יבשת אמריקה</option>
+              </select>
+            </div>
+            <div>
+              <label for="window">חלון זמן</label>
+              <select id="window">
+                <option value="7">7 ימים אחרונים</option>
+                <option value="14">14 ימים אחרונים</option>
+                <option value="30">30 ימים אחרונים</option>
+                <option value="60">60 ימים אחרונים</option>
+              </select>
+            </div>
+            <div>
+              <label for="minScore">ביטחון מינימלי</label>
+              <select id="minScore">
+                <option value="0">הצג הכל</option>
+                <option value="0.35">≥ 0.35</option>
+                <option value="0.55" selected>≥ 0.55</option>
+                <option value="0.70">≥ 0.70</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="grid4" style="font-size:13px">
+            <div>
+              <div class="tag good"><b id="srcOk">0</b> מקורות תקינים</div>
+            </div>
+            <div>
+              <div class="tag warn"><b id="srcPartial">0</b> חלקי</div>
+            </div>
+            <div>
+              <div class="tag bad"><b id="srcFail">0</b> נכשל</div>
+            </div>
+            <div>
+              <div class="k">אשכולות: <b id="clusterCount">0</b></div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="elist" id="eventList" aria-live="polite"></div>
+
+          <details style="margin-top:14px">
+            <summary>
+              <span>אלגוריתם אשכול (הערות מחקר)</span>
+              <span class="badgeDot"></span>
+            </summary>
+            <div class="inside">
+              <p>
+                <b>שיטה:</b> דמיון Jaccard מבוסס-טוקן + קרבה זמנית + חפיפת מיקום.
+                פריטים מאוגדים באשכולות כאשר הציון המשולב עובר סף (0.26). זה מאזן דיוק
+                (גבוה מדי = התאמות שהוחמצו) לעומת רעש (נמוך מדי = מיזוגים שגויים).
+              </p>
+              <p style="margin-top:8px">
+                <b>חישוב ביטחון:</b> 55% משקל אימות (יותר מקורות = ביטחון גבוה יותר),
+                35% איכות מטא-נתונים (כתובות URL, חותמות זמן, מיקומים), 10% בונוס לכידות (סטייה נמוכה).
+                זה מעניש אשכולות שבהם מקורות מספרים סיפורים שונים באופן יסודי.
+              </p>
+              <p style="margin-top:8px">
+                <b>מגבלות ידועות:</b> דמיון מבוסס-טוקן מפספס שוויון סמנטי
+                ("הפסקת אש" לעומת "שביתת נשק" לעומת "הפסקת איבה"). עתיד: אשכול מבוסס-embedding
+                עם מודלים מקומיים ONNX לשמירת פרטיות.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <aside class="col card">
+        <div class="hd">
+          <h2>בריאות מערכת 🌡️</h2>
+        </div>
+        <div class="bd">
+          <div class="vizWrap">
+            <canvas id="healthViz" width="600" height="280"></canvas>
+          </div>
+          <div class="sep"></div>
+          <div class="tiny">
+            <div class="k">תקציב ביצועים: <b id="perfBudget">—</b></div>
+            <div class="k">אשכול אחרון: <b id="perfCluster">—</b></div>
+            <div class="k">גודל IndexedDB: <b id="perfStorage">—</b></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <section class="card" id="ontology" style="margin-top:14px">
+      <div class="hd">
+        <h2>מודול מחקר: ניתוח אונטולוגי 🧬</h2>
+        <div class="right">
+          <button class="btn small" id="analyzeOntologyBtn">נתח מסגרות</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tabs">
+          <button class="active" data-tab="ontoExplain">תיאוריה</button>
+          <button data-tab="ontoResults">תוצאות</button>
+          <button data-tab="ontoMatrix">מטריצת מסגרות</button>
+        </div>
+
+        <div id="ontoExplain" class="tabContent active">
+          <h3>למה אונטולוגיה חשובה</h3>
+          <p>
+            כאשר שני מקורות מדווחים על אותו אירוע אך משתמשים בשפה שונה באופן רדיקלי, הם לעתים קרובות
+            פועלים בתוך <b>מסגרות אונטולוגיות</b> שונות - מערכות שונות לסיווג
+            מה קיים ומה חשוב. ארגון הומניטרי עשוי לתאר תקיפה אווירית כ
+            "הפרת המשפט ההומניטרי הבינלאומי המכוונת לאזרחים", בעוד מקור צבאי מתאר זאת כ"נטרול
+            של מטרה צבאית לגיטימית", ואנליסט פוליטי קורא לזה "התגרות מסלימה".
+          </p>
+          <p style="margin-top:12px">
+            אלו לא רק בחירות מילים. הן משקפות:
+          </p>
+          <ul style="margin-top:8px">
+            <li><b>מסגרות משפטיות</b> (משפט הומניטרי בינלאומי לעומת כללי עימות)</li>
+            <li><b>עדיפויות מוסריות</b> (הגנת אזרחים לעומת צורך צבאי לעומת אסטרטגיה פוליטית)</li>
+            <li><b>תקני אפיסטמי</b> (אבדות מאומתות לעומת לוחמים משוערים לעומת כוונה מיוחסת)</li>
+          </ul>
+          <p style="margin-top:12px">
+            מודול זה מזהה אילו מסגרות כל מקור משתמש על ידי ניתוח דפוסי אוצר מילים,
+            ואז מציף היכן התנגשויות מסגרות יוצרות אי-התאמה עובדתית לכאורה שהיא למעשה
+            חוסר התאמה רעיונית עמוקה יותר.
+          </p>
+
+          <details style="margin-top:12px">
+            <summary>
+              <span>יישום טכני</span>
+              <span class="badgeDot warn"></span>
+            </summary>
+            <div class="inside">
+              <p>
+                התאמת דפוסים כנגד שלוש קבוצות אוצר מילים: (1) מונחי משפט הומניטרי (IHL, אמנות ז'נבה,
+                אנשים מוגנים, פרופורציונליות), (2) מונחים מבצעיים צבאיים (נטרל, מטרה, לוחם,
+                נזק נלווה, ROE), (3) מונחי מסגור פוליטי (תוקפנות, התגרות, תגמול, לגיטימיות).
+              </p>
+              <p style="margin-top:8px">
+                כל אשכול מקבל וקטור פרופיל אונטולוגי. גיוון גבוה = התנגשות מסגרות.
+                זה מסביר סטייה שאינה שגיאת מדידה אלא חוסר התאמה רעיונית.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div id="ontoResults" class="tabContent">
+          <div id="ontoResultsBox" class="muted">
+            הפעל ניתוח כדי לראות תוצאות.
+          </div>
+        </div>
+
+        <div id="ontoMatrix" class="tabContent">
+          <div class="vizWrap">
+            <canvas id="ontoCanvas" width="700" height="400"></canvas>
+          </div>
+          <div class="sep"></div>
+          <div class="tiny muted">
+            מטריצה מציגה חפיפת מסגרות בין אשכולות. תאים בהירים = שימוש גבוה במסגרת זו.
+            אשכולות המשתמשים במספר מסגרות בו-זמנית מצביעים על מתח רעיוני.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="temporal" style="margin-top:14px">
+      <div class="hd">
+        <h2>מודול מחקר: מהירות נרטיב והאצה 📈</h2>
+        <div class="right">
+          <button class="btn small" id="trackTemporalBtn">עקוב אחר התפתחות</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tabs">
+          <button class="active" data-tab="tempExplain">תיאוריה</button>
+          <button data-tab="tempViz">ויזואליזציה</button>
+          <button data-tab="tempAlerts">התראות מהירות</button>
+        </div>
+
+        <div id="tempExplain" class="tabContent active">
+          <h3>למה דינמיקה זמנית חשובה</h3>
+          <p>
+            דיווחי סכסוך מוקדמים הם לעתים קרובות סותרים פשוט כי מידע נדיר וכאוטי.
+            לאורך ימים, ככל שמקורות נוספים אוספים נתונים, נרטיבים בדרך כלל <b>מתכנסים באופן טבעי</b> לעבר
+            קונצנזוס. אבל תעמולה מנצלת את אותו תהליך התכנסות - שחקנים מתואמים יכולים להוביל
+            קונצנזוס מלאכותי על ידי הצפת האזור בהודעות מיושרות.
+          </p>
+          <p style="margin-top:12px">
+            השאלה שמודול זה שואל: <b>כמה מהר נרטיבים מתכנסים, והאם המהירות הזו טבעית?</b>
+          </p>
+          <p style="margin-top:12px">
+            אנו עוקבים אחר שני מדדים:
+          </p>
+          <ul style="margin-top:8px">
+            <li><b>מהירות סטייה:</b> קצב שינוי באי-הסכמה (Δסטייה / Δזמן)</li>
+            <li><b>האצת סטייה:</b> האם התכנסות מואצת או יציבה (ΔΔסטייה / ΔΔזמן)</li>
+          </ul>
+          <p style="margin-top:12px">
+            התכנסות טבעית: הדרגתית, מאטה (מתחילה מהר, מאטה ככל שקונצנזוס מתעורר). התכנסות חשודה:
+            פתאומית, מואצת (מקורות הופכים עמדות במהירות, לעתים קרובות בגלים מתואמים).
+          </p>
+
+          <details style="margin-top:12px">
+            <summary>
+              <span>ניסוח מתמטי</span>
+              <span class="badgeDot warn"></span>
+            </summary>
+            <div class="inside">
+              <pre>תהי D(t) = ציון סטייה בזמן t
+מהירות = (D(t) - D(t-1)) / Δt
+האצה = (מהירות(t) - מהירות(t-1)) / Δt
+
+תנאי התראה:
+- אם |מהירות| > סף וגם האצה > 0 → "התכנסות מהירה"
+- אם מספר אשכולות מציגים שיאי מהירות מסונכרנים → "לחץ מתואם"</pre>
+            </div>
+          </details>
+        </div>
+
+        <div id="tempViz" class="tabContent">
+          <div class="vizWrap">
+            <canvas id="tempCanvas" width="800" height="360"></canvas>
+          </div>
+          <div class="sep"></div>
+          <div class="tiny muted">
+            גרף מציג ציוני סטייה לאורך זמן עבור אשכולות מובילים. ירידות תלולות = התכנסות מהירה.
+            ירידות מקבילות מרובות = תיאום פוטנציאלי.
+          </div>
+        </div>
+
+        <div id="tempAlerts" class="tabContent">
+          <div id="tempAlertsBox" class="muted">
+            אין עדיין נתוני מעקב זמני. לחץ "עקוב אחר התפתחות" ורענן מעת לעת.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="provenance" style="margin-top:14px">
+      <div class="hd">
+        <h2>מודול מחקר: מיפוי עצמאות מקורות 🕸️</h2>
+        <div class="right">
+          <button class="btn small" id="mapProvenanceBtn">בנה גרף</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tabs">
+          <button class="active" data-tab="provExplain">תיאוריה</button>
+          <button data-tab="provGraph">גרף תלות</button>
+          <button data-tab="provScores">ציוני עצמאות</button>
+        </div>
+
+        <div id="provExplain" class="tabContent active">
+          <h3>בעיית העצמאות</h3>
+          <p>
+            מודל היתירות שלך מניח יותר מקורות = יותר ביטחון. אבל אם שלושה כלי חדשות כולם מצטטים
+            את אותו שירות חדשות, יש לך <b>הגברה, לא אימות</b>. אם שני ארגונים לא-ממשלתיים מסתמכים על
+            אותה רשת שותפים מקומית, ההסכמה שלהם משקפת חלקית תשתית משותפת, לא אימות
+            עצמאי.
+          </p>
+          <p style="margin-top:12px">
+            זוהי הבעיה הקשה ביותר בניתוח ממקורות מרובים: <b>עד כמה המקורות שלך באמת עצמאיים?</b>
+          </p>
+          <p style="margin-top:12px">
+            מודול זה מנסה להעריך תלויות מקורות על ידי:
+          </p>
+          <ul style="margin-top:8px">
+            <li>זיהוי כתובות URL נפוצות (מקורות מרובים מצטטים את אותו מקור)</li>
+            <li>מעקב אחר יחסים ארגוניים (מבני משרד שטח ארגוני לא-ממשלתי)</li>
+            <li>ניתוח תזמון (סיפורים המופיעים בו-זמנית מציעים הזנות משותפות)</li>
+            <li>טביעת אצבע שפה (ניסוח זהה מצביע על העתקה)</li>
+          </ul>
+          <p style="margin-top:12px">
+            המערכת לאחר מכן מתאימה ציוני ביטחון: אשכולות בעלי עצמאות גבוהה מקבלים בונוסים, עצמאות נמוכה
+            מקבלת עונשים. אשכול בן שלושה מקורות שבו כל המקורות עצמאיים חזק יותר מאשכול בן חמישה מקורות
+            שבו ארבעה נמצאים במורד הזרם מאחד.
+          </p>
+
+          <details style="margin-top:12px">
+            <summary>
+              <span>מתודולוגיית הערכה</span>
+              <span class="badgeDot bad"></span>
+            </summary>
+            <div class="inside">
+              <p>
+                זה בהכרח <b>היוריסטי</b>. מעקב מקור אמיתי דורש מטא-נתונים שמקורות
+                לעתים קרובות לא מספקים (מי ראיין את מי, אילו מסמכים נבדקו, אילו דוחות שטח
+                הוזנו לאילו סיכומים). אנו משתמשים בפרוקסי:
+              </p>
+              <ul style="margin-top:8px">
+                <li>חפיפת URL → קצה תלות (משקל = 1.0)</li>
+                <li>פרסום באותה שעה → הזנה משותפת אפשרית (משקל = 0.4)</li>
+                <li>דמיון טקסט גבוה → העתקה פוטנציאלית (משקל = 0.6)</li>
+              </ul>
+              <p style="margin-top:8px">
+                התאמת ביטחון: ציון_עצמאות = 1 - (Σ משקלי_קצוות / קצוות_אפשריים).
+                ביטחון סופי *= (0.7 + 0.3 * ציון_עצמאות).
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div id="provGraph" class="tabContent">
+          <div class="vizWrap">
+            <canvas id="provCanvas" width="700" height="420"></canvas>
+          </div>
+          <div class="sep"></div>
+          <div class="tiny muted">
+            גרף רשת: צמתים הם מקורות, קצוות הם תלויות. קצוות עבים יותר = תלות חזקה יותר.
+            צמתים מבודדים = מקורות עצמאיים (ערך גבוה). אשכולות צפופים = תאי הד פוטנציאליים.
+          </div>
+        </div>
+
+        <div id="provScores" class="tabContent">
+          <div id="provScoresBox" class="muted">
+            הפעל ניתוח מקור כדי לראות ציוני עצמאות לכל אשכול.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="action" style="margin-top:14px">
+      <div class="hd">
+        <h2>מודול מחקר: יכולת פעולה וספי ביטחון 🎯</h2>
+        <div class="right">
+          <button class="btn small" id="calculateThresholdsBtn">חשב ספים</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tabs">
+          <button class="active" data-tab="actExplain">תיאוריה</button>
+          <button data-tab="actMatrix">מטריצת סיכון-ביטחון</button>
+          <button data-tab="actPlans">תוכניות פעולה שנוצרו</button>
+        </div>
+
+        <div id="actExplain" class="tabContent active">
+          <h3>בעיית הסף</h3>
+          <p>
+            לא כל הפעולות דורשות את אותה רמת ודאות. תרומה של 20 דולר לארגון הומניטרי מבוסס
+            שעובד באזור סכסוך היא פעולה בעלת סיכון נמוך - גם אם פרטים ספציפיים לא ברורים,
+            הצורך הכללי אמיתי והארגון יש לו תשתית לפרוס סיוע באחריות. אבל להתקשר
+            לסנטור שלך לדרוש סנקציות נגד אנשים או ישויות ספציפיים היא פעולה בעלת סיכון גבוה - אם
+            הטענות העובדתיות שלך שגויות, אתה לוחץ למדיניות מזיקה.
+          </p>
+          <p style="margin-top:12px">
+            מודול זה מפרמל את הקשר בין <b>סיכון פעולה</b>, <b>ראיות זמינות</b>,
+            ו<b>סף אחראי</b>.
+          </p>
+          <p style="margin-top:12px">
+            טקסונומיית פעולות עם רמות סיכון:
+          </p>
+          <ul style="margin-top:8px">
+            <li><b>סיכון נמוך מאוד:</b> תמיכה בסיוע הומניטרי כללי (סף: 0.35)</li>
+            <li><b>סיכון נמוך:</b> שיתוף סיכום זהיר המצטט מקורות מרובים (סף: 0.50)</li>
+            <li><b>סיכון בינוני:</b> הצטרפות לקמפיין תמיכה מאורגן עם דרישות ברורות (סף: 0.65)</li>
+            <li><b>סיכון גבוה:</b> לחץ על נציגים למדיניות ספציפית (סף: 0.80)</li>
+            <li><b>סיכון גבוה מאוד:</b> הגבר טענות על אנשים בשמם (סף: 0.90)</li>
+          </ul>
+          <p style="margin-top:12px">
+            הפלטפורמה מחשבת האם כל אשכול עומד בסף לכל סוג פעולה, ולאחר מכן
+            מייצרת תוכניות מתאימות. אם הביטחון הוא 0.62, אתה מקבל אפשרויות סיכון בינוני אך לא גבוה.
+          </p>
+
+          <details style="margin-top:12px">
+            <summary>
+              <span>ניסוח מתמטי</span>
+              <span class="badgeDot warn"></span>
+            </summary>
+            <div class="inside">
+              <pre>עבור אשכול C עם ציון ביטחון S:
+פעולות_זמינות = { A | סף(A) ≤ S }
+
+פונקציית סיכון R(A):
+R(A) = נזק_פוטנציאלי(A) / הפיכות(A)
+
+גזירת סף:
+סף(A) = ביטחון_מינימלי כאשר E[נזק | שגוי] < סיכון_מקובל
+
+זה מדגם עיקרון זהירות: ככל שחוסר ההפיכות עולה, רף הראיות עולה.</pre>
+            </div>
+          </details>
+        </div>
+
+        <div id="actMatrix" class="tabContent">
+          <div class="vizWrap">
+            <canvas id="actCanvas" width="700" height="380"></canvas>
+          </div>
+          <div class="sep"></div>
+          <div class="tiny muted">
+            מפת חום: שורות = סוגי פעולות, עמודות = רמות ביטחון. עוצמת צבע = התאמה.
+            ירוק כהה = פעולה מוצדקת, אדום = פעולה לא מוצדקת, צהוב = גבולי.
+          </div>
+        </div>
+
+        <div id="actPlans" class="tabContent">
+          <label for="planCluster">בחר אשכול לתכנון פעולה:</label>
+          <select id="planCluster"></select>
+          <div class="sep"></div>
+          <div id="actPlansBox" class="muted">
+            בחר אשכול למעלה.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="adversarial" style="margin-top:14px">
+      <div class="hd">
+        <h2>מודול מחקר: סימולציית צוות אדום 🛡️</h2>
+        <div class="right">
+          <button class="btn danger small" id="runRedTeamBtn">הפעל סימולציית התקפה</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tabs">
+          <button class="active" data-tab="advExplain">תיאוריה</button>
+          <button data-tab="advScenarios">תרחישי התקפה</button>
+          <button data-tab="advResults">תוצאות סימולציה</button>
+        </div>
+
+        <div id="advExplain" class="tabContent active">
+          <h3>מודל איום אדברסרי</h3>
+          <p>
+            מודל היתירות שלך מניח שמקורות פועלים בתום לב, אולי עם נקודות מבט שונות,
+            אבל מנסים לדווח על המציאות. אבל מה אם יריב <b>מבין את האלגוריתם שלך</b> ו
+            מתכנן התקפות להביסו?
+          </p>
+          <p style="margin-top:12px">
+            התקפות אפשריות:
+          </p>
+          <ul style="margin-top:8px">
+            <li><b>בדיה מתואמת:</b> שתילת סיפור שקרי במספר מקורות "עצמאיים" בו-זמנית</li>
+            <li><b>התחזות למקור:</b> יצירת פלטפורמות מזויפות המחקות סגנון של מקורות מהימנים</li>
+            <li><b>מניפולציית תזמון:</b> בימוי דיווחים שקריים ליצירת דפוסי התכנסות מלאכותיים</li>
+            <li><b>זיהום אונטולוגי:</b> הזרקת שפה ממסגרות מרובות כדי להיראות מאוזן</li>
+            <li><b>טשטוש מקור:</b> הסתרת יחסי תלות כדי לזייף עצמאות</li>
+          </ul>
+          <p style="margin-top:12px">
+            מודול זה מריץ <b>סימולציות התקפה מבוקרות</b> שבהן נרטיבים שקריים סינתטיים מוזרקים
+            לתוך הנתונים האמיתיים שלך, ולאחר מכן מודד האם האשכול, ניקוד הביטחון וזיהוי הסטייה
+            שלך היו מסמנים אותם כחשודים.
+          </p>
+          <p style="margin-top:12px">
+            <b>הערת בטיחות קריטית:</b> התקפות מדומות מסומנות בבירור ומאוחסנות בנפרד. הן לעולם לא
+            מזהמות נתונים אמיתיים. לאחר הסימולציה, אתה יכול לבחון אילו התקפות הצליחו (שליליים שגויים)
+            ואילו המערכת שלך זיהתה (חיוביים אמיתיים). זה מחקר, לא הונאה מבצעית.
+          </p>
+
+          <details style="margin-top:12px">
+            <summary>
+              <span>אמצעי הגנה אתיים</span>
+              <span class="badgeDot bad"></span>
+            </summary>
+            <div class="inside">
+              <p>
+                צוות אדום לעולם לא חייב לפגוע בניתוח אמיתי. כל ההתקפות המדומות:
+              </p>
+              <ul style="margin-top:8px">
+                <li>מסומנות בבירור כסינתטיות באחסון</li>
+                <li>משתמשות בשמות מיקום/ישות בדיוניים ברורים</li>
+                <li>לא ניתנות לייצוא עם נתונים אמיתיים</li>
+                <li>מנוקות אוטומטית לאחר 24 שעות</li>
+                <li>לעולם לא מופעלות ללא יזמה מפורשת של משתמש</li>
+              </ul>
+              <p style="margin-top:8px">
+                המטרה היא הגנתית: הבינו את מגבלות המערכת שלכם כדי שתדעו מתי לא לסמוך עליה.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div id="advScenarios" class="tabContent">
+          <h4>בחר תרחיש התקפה:</h4>
+          <div class="sep"></div>
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <label>
+              <input type="radio" name="advScenario" value="coordinated" checked>
+              <b>בדיה מתואמת:</b> שלושה מקורות מזויפים מדווחים על אותו אירוע שקרי תוך שעתיים
+            </label>
+            <label>
+              <input type="radio" name="advScenario" value="impersonation">
+              <b>התחזות למקור:</b> פלטפורמה מזויפת מחקה דפוסי שפה של מקור מהימן
+            </label>
+            <label>
+              <input type="radio" name="advScenario" value="timing">
+              <b>מניפולציית תזמון:</b> בימוי התכנסות מלאכותית (סוטה → הסכמה מהירה)
+            </label>
+            <label>
+              <input type="radio" name="advScenario" value="ontology">
+              <b>זיהום אונטולוגי:</b> ערבוב מסגרות כדי להיראות מאוזן (מונחים הומניטריים + צבאיים)
+            </label>
+            <label>
+              <input type="radio" name="advScenario" value="provenance">
+              <b>טשטוש מקור:</b> מקורות מרובים מסתירים את מקורם המשותף
+            </label>
+          </div>
+          <div class="sep"></div>
+          <div class="tiny muted">
+            סימולציות משתמשות בנתונים בדיוניים (מיקומים: "טסטיסטן", מקורות: "רשת חדשות לדוגמה").
+            התוצאות מראות האם המערכת שלך היתה מזהה את דפוס ההתקפה.
+          </div>
+        </div>
+
+        <div id="advResults" class="tabContent">
+          <div id="advResultsBox" class="muted">
+            הפעל סימולציה כדי לראות תוצאות.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="participatory" style="margin-top:14px">
+      <div class="hd">
+        <h2>מודול מחקר: מסלול ידע קהילתי 🤝</h2>
+        <div class="right">
+          <button class="btn small" id="communityGuidelinesBtn">הנחיות בטיחות</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tabs">
+          <button class="active" data-tab="partExplain">תיאוריה</button>
+          <button data-tab="partSubmit">הגש ידע</button>
+          <button data-tab="partReview">סקור הגשות</button>
+        </div>
+
+        <div id="partExplain" class="tabContent active">
+          <h3>בעיית הייצוג</h3>
+          <p>
+            הפלטפורמה שלך מצרפת מקורות מוסדיים: ארגוני חדשות, סוכנויות הומניטריות, מערכי
+            נתוני מחקר. אבל אנשים החיים דרך סכסוכים יש להם ידע שעשוי לעולם לא להופיע בערוצים אלה - או
+            כי דיווח מסוכן מדי, או שקולותיהם אינם נחשבים "סמכותיים", או שמה שהם
+            יודעים לא מתאים לתבניות דיווח.
+          </p>
+          <p style="margin-top:12px">
+            זה יוצר <b>עוול אפיסטמי</b>: לאנשים עם הידע הישיר ביותר יש את הפחות
+            ייצוג במערכות מידע הטוענות לתאר את המציאות שלהם.
+          </p>
+          <p style="margin-top:12px">
+            מודול זה מנסה לטפל בכך על ידי יצירת מסלול לידע שתרם הקהילה ש:
+          </p>
+          <ul style="margin-top:8px">
+            <li>מכבד בטיחות תורם (אנונימיזציה אופציונלית, אין מטא-נתונים כפויים)</li>
+            <li>שומר על שליטת תורם (הסכמה לשימוש, יכולת לחזור בו)</li>
+            <li>שוקל כראוי (לניסיון חי יש ערך אפיסטמי שונה מדיווחים מוסדיים)</li>
+            <li>נמנע מחילוץ (קהילות נהנות מניתוח, לא רק מספקות נתונים)</li>
+          </ul>
+          <p style="margin-top:12px">
+            <b>בטיחות קריטית:</b> תורמים באזורי סכסוך נמצאים בסיכון אמיתי. מערכת זו לעולם לא דורשת
+            מידע מזהה, לעולם לא משדרת נתוני מיקום אוטומטית, ומאחסנת תרומות מקומית
+            עם הצפנה. תכונות ייצוא מזהירות במפורש על סיכוני דה-אנונימיזציה.
+          </p>
+
+          <details style="margin-top:12px">
+            <summary>
+              <span>מסגרת אתית</span>
+              <span class="badgeDot warn"></span>
+            </summary>
+            <div class="inside">
+              <p>
+                מבוסס על עקרונות ממחקר פעולה השתתפותי וריבונות נתונים ילידית:
+              </p>
+              <ul style="margin-top:8px">
+                <li><b>עקרונות CARE:</b> תועלת קולקטיבית, סמכות לשלוט, אחריות, אתיקה</li>
+                <li><b>הסכמה מדעת:</b> הסבר ברור כיצד תרומות משמשות</li>
+                <li><b>הפיכות:</b> תורמים יכולים לחזור בהם מידע בכל עת</li>
+                <li><b>אי-חילוץ:</b> תוצאות ניתוח משותפות בחזרה לקהילות</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+
+        <div id="partSubmit" class="tabContent">
+          <p class="tiny muted" style="margin-bottom:12px">
+            <b>בטיחות קודם כל:</b> אם אתה מגיש מאזור סכסוך, השתמש ב-VPN/Tor. פלטפורמה זו מאחסנת מקומית,
+            אבל כל ייצוא יכול להיות ליירט. שקול בזהירות לפני שיתוף מידע רגיש.
+          </p>
+
+          <label for="partType">סוג ידע:</label>
+          <select id="partType">
+            <option value="observation">תצפית ישירה (מה שראיתי)</option>
+            <option value="testimony">עדות אישית (מה שקרה לי/לקהילה שלי)</option>
+            <option value="analysis">ניתוח קהילתי (מה שאנחנו מבינים ביחד)</option>
+            <option value="correction">תיקון (שגיאות בדיווח מוסדי)</option>
+          </select>
+
+          <label for="partLocation">מיקום (אופציונלי, יכול להיות מעורפל כמו "אזור צפוני"):</label>
+          <input id="partLocation" placeholder="השאר ריק או השתמש באזור כללי">
+
+          <label for="partTime">תקופת זמן (אופציונלי):</label>
+          <input id="partTime" type="text" placeholder='למשל, "דצמבר 2025" או "חודש שעבר"'>
+
+          <label for="partContent">מה שאתה רוצה לשתף:</label>
+          <textarea id="partContent" rows="6" placeholder="תאר מה שאתה יודע. אתה שולט בכמה פרטים לכלול."></textarea>
+
+          <div class="sep"></div>
+
+          <label style="display:flex; align-items:center; gap:8px; margin:12px 0">
+            <input type="checkbox" id="partConsent">
+            <span class="tiny">אני מבין/ה שזה מאוחסן מקומית במכשיר שלי ואני יכול/ה למחוק אותו בכל עת.</span>
+          </label>
+
+          <label style="display:flex; align-items:center; gap:8px; margin:12px 0">
+            <input type="checkbox" id="partAnon">
+            <span class="tiny">שמור על זה אנונימי (מומלץ אם בטיחות מהווה דאגה).</span>
+          </label>
+
+          <div class="right" style="margin-top:12px">
+            <button class="btn primary" id="submitPartBtn">הגש לאחסון מקומי</button>
+            <button class="btn" id="clearPartFormBtn">נקה טופס</button>
+          </div>
+        </div>
+
+        <div id="partReview" class="tabContent">
+          <div id="partReviewBox" class="muted">
+            אין עדיין הגשות קהילתיות.
+          </div>
+          <div class="sep"></div>
+          <button class="btn danger small" id="clearAllPartBtn">נקה את כל ההגשות</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="performance" style="margin-top:14px">
+      <div class="hd">
+        <h2>מודול מחקר: ניתוח ביצועים וסקלביליות 📊</h2>
+        <div class="right">
+          <button class="btn small" id="runPerfTestBtn">הרץ בדיקת עומס</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tabs">
+          <button class="active" data-tab="perfExplain">תיאוריה</button>
+          <button data-tab="perfMetrics">מדדים נוכחיים</button>
+          <button data-tab="perfScaling">עקומות סקלה</button>
+        </div>
+
+        <div id="perfExplain" class="tabContent active">
+          <h3>שאלת הסקלביליות</h3>
+          <p>
+            הארכיטקטורה הנוכחית שלך פועלת לחלוטין בצד הלקוח, וזה מבריק לפרטיות ויכולת לא-מקוונת
+            אבל יש לה מגבלות חישוביות. ככל שאתה מגדיל מניטור של 2-3 סכסוכים עם 50 אירועים לניטור
+            עשרות סכסוכים עם אלפי אירועים, משהו נשבר ראשון. הבנה <b>מה נשבר ומתי</b>
+            חיונית לתכנון מערכת.
+          </p>
+          <p style="margin-top:12px">
+            מודול זה מפרפל פעולות מפתח ומעריך התנהגות סקלה:
+          </p>
+          <ul style="margin-top:8px">
+            <li><b>אשכול:</b> יישום נאיבי O(n²) → מה המגבלה המעשית?</li>
+            <li><b>אחסון:</b> ל-IndexedDB יש מגבלות (50MB טיפוסי, משתנה לפי דפדפן)</li>
+            <li><b>רינדור:</b> עדכוני DOM נעשים איטיים עם >500 פריטים גלויים</li>
+            <li><b>ניתוח:</b> שכבות אונטולוגיה/זמניות/מקור מוסיפות עלות חישובית</li>
+          </ul>
+          <p style="margin-top:12px">
+            בדיקות ביצועים מזריקות מערכי נתונים סינתטיים בגדלים שונים, מודדות זמני השלמה, ומבצעות אקסטרפולציה
+            כדי לחזות היכן צווארי בקבוק צצים. תוצאות מנחות החלטות ארכיטקטוניות (למשל, מתי לעבור ל
+            Web Workers, מתי אשכול היררכי הופך נחוץ).
+          </p>
+
+          <details style="margin-top:12px">
+            <summary>
+              <span>מתודולוגיית מדידה</span>
+              <span class="badgeDot warn"></span>
+            </summary>
+            <div class="inside">
+              <pre>סוויטת בדיקות:
+1. יצור אירועים סינתטיים (100, 500, 1000, 2500, 5000)
+2. תזמן פעולת אשכול (JS טהור, thread ראשי)
+3. תזמן ניתוח אונטולוגיה (התאמת דפוסים בכל הפריטים)
+4. תזמן בניית גרף מקור (O(n²) מקרה גרוע)
+5. תזמן רינדור DOM (עדכוני innerHTML)
+6. מדוד throughput כתיבת IndexedDB
+
+עקומת סקלה: התאם חוק כוח לנקודות נתונים (n, זמן).
+סף: חזה n כאשר פעולה עוברת שניתיים (שבירת UX)</pre>
+            </div>
+          </details>
+        </div>
+
+        <div id="perfMetrics" class="tabContent">
+          <div id="perfMetricsBox" class="muted">
+            הרץ בדיקת עומס לאיסוף מדדים.
+          </div>
+        </div>
+
+        <div id="perfScaling" class="tabContent">
+          <div class="vizWrap">
+            <canvas id="perfCanvas" width="700" height="380"></canvas>
+          </div>
+          <div class="sep"></div>
+          <div class="tiny muted">
+            עלילה לוג-לוג: ציר x = גודל מערך נתונים, ציר y = זמן פעולה. ליניארי בחלל לוג-לוג מצביע
+            סקלה חוק כוח. שיפוע תלול יותר = סקלה גרועה יותר. אזור אדום = עובר 2 שניות (חוויית משתמש נשברת).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="sources" style="margin-top:14px">
+      <div class="hd">
+        <h2>מקורות נתונים ומחברים 🔌</h2>
+        <div class="right">
+          <button class="btn small" id="addCustomSourceBtn">הוסף מקור מותאם</button>
+          <button class="btn danger small" id="clearKeysBtn">נקה מפתחות מאוחסנים</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tiny muted" style="margin-bottom:12px; line-height:1.5">
+          ניטור ברמת מחקר דורש מקורות מגוונים ועצמאיים. פלטפורמה זו כוללת מחברים ציבוריים
+          (GDELT, ReliefWeb) ותומכת בנקודות קצה מותאמות + ייבוא ידני עבור מערכי נתונים חסומי-CORS.
+        </div>
+        <div id="sourceCards" class="grid2"></div>
+      </div>
+    </section>
+
+    <section class="card" id="settings" style="margin-top:14px">
+      <div class="hd">
+        <h2>הגדרות ובקרות פרטיות ⚙️</h2>
+        <div class="right">
+          <button class="btn small" id="swStatusBtn">מצב SW</button>
+          <button class="btn danger small" id="wipeAllBtn">מחק את כל הנתונים</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="grid3">
+          <div>
+            <h4>לא-מקוון ומטמון</h4>
+            <div class="sep"></div>
+            <label style="display:flex; align-items:center; gap:8px">
+              <input type="checkbox" id="offlineCacheToggle">
+              <span class="tiny">שמור תוצאות לשימוש לא-מקוון</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; margin-top:8px">
+              <input type="checkbox" id="autoRefreshToggle">
+              <span class="tiny">רענון אוטומטי בפתיחה</span>
+            </label>
+          </div>
+          <div>
+            <h4>ניתוח מקומי</h4>
+            <div class="sep"></div>
+            <label style="display:flex; align-items:center; gap:8px">
+              <input type="checkbox" id="localAnalyticsToggle">
+              <span class="tiny">עקוב אחר שימוש מקומית (לעולם לא נשלח)</span>
+            </label>
+            <div class="sep"></div>
+            <button class="btn small" id="resetAnalyticsBtn">אפס ניתוח</button>
+          </div>
+          <div>
+            <h4>בטיחות</h4>
+            <div class="sep"></div>
+            <div class="tiny muted" style="line-height:1.5">
+              • אין שליחה אוטומטית<br>
+              • קלט מסונן<br>
+              • מוגבל קצב<br>
+              • אין טלמטריה<br>
+              • סימולציות צוות-אדום מסומנות סינתטי<br>
+              • נתוני קהילה מוצפנים מקומית
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <b>התחייבות לאפס-נזק ואנטי-היפוך:</b> פלטפורמה זו היא כלי מחקר לאינפורמטיקה לשלום.
+      היא חוקרת איכות מידע ללא כפייה, מאחסנת נתונים מקומית ללא טלמטריה, ותומכת
+      במסלולי פעולה לא-אלימים ללא לחץ. בדיקות אדברסריות הן הגנתיות. מסלולי ידע קהילתי
+      מכבדים בטיחות והסכמה. כל הניתוח נשאר בשליטת משתמש. 🕊️
+      <div class="faint" style="margin-top:8px">
+        אין סודות מאוחסנים. אין שליחה אוטומטית. בקרות מחיקה ברורות. התקפות מדומות מסומנות בבירור. אזהרות ייצוא כלולות.
+      </div>
+    </footer>
+  </main>
+
+  <div class="hud" id="hud" role="region" aria-label="HUD מחקר">
+    <div class="hhd">
+      <div style="display:flex; align-items:center; gap:10px">
+        <div class="badgeDot"></div>
+        <div>
+          <div style="font-weight:900; font-size:13px">HUD מחקר</div>
+          <div style="font-size:10px; color:var(--faint)">מקומי בלבד • גרור להזיז</div>
+        </div>
+      </div>
+      <button class="btn small" id="minHudBtn">—</button>
+    </div>
+    <div class="hbd">
+      <div class="tiny muted">התקדמות ניתוח</div>
+      <div class="meter"><i id="momentumBar" style="--w: 25%"></i></div>
+
+      <div class="mini">
+        <div class="box">
+          <div class="v" id="hudClusters">0</div>
+          <div class="t">אשכולות</div>
+        </div>
+        <div class="box">
+          <div class="v" id="hudRefreshes">0</div>
+          <div class="t">רעננים</div>
+        </div>
+        <div class="box">
+          <div class="v" id="hudModules">0/7</div>
+          <div class="t">מודולים הופעלו</div>
+        </div>
+        <div class="box">
+          <div class="v" id="hudStreak">0</div>
+          <div class="t">רצף ימים</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary small" id="hudQuickRefresh">רענון מהיר</button>
+        <button class="btn small" id="hudSnapshot">צילום מסך</button>
+      </div>
+    </div>
+  </div>
+
+  <noscript>
+    <div style="max-width:900px;margin:18px auto;padding:12px 14px;border:1px solid #888;border-radius:14px;background:#fff;color:#000">
+      <b>JavaScript נדרש:</b> פלטפורמת מחקר זו צריכה JS לניתוח, אחסון לא-מקוון, וויזואליזציה.
+    </div>
+  </noscript>
+
+  <script>
+    /* =========================================================
+       RESEARCH PLATFORM: JavaScript Implementation (Hebrew UI)
+       All user-facing messages in Hebrew, code remains technical
+    ========================================================== */
+
+    // ==== Utility Layer ====
+    const Safe = (() => {
+      const escape = (s) => String(s ?? "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;").replaceAll("'","&#39;");
+      const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+      const limiter = (() => {
+        const state = { last: 0, tokens: 4, refillMs: 4000, max: 4 };
+        return {
+          allow() {
+            const t = Date.now(), delta = t - state.last;
+            if (delta > state.refillMs) {
+              state.tokens = Math.min(state.max, state.tokens + Math.floor(delta / state.refillMs));
+              state.last = t;
+            }
+            if (state.tokens <= 0) return false;
+            state.tokens -= 1;
+            return true;
+          }
+        };
+      })();
+      const hash = (text) => {
+        let h = 2166136261;
+        for (let i=0;i<text.length;i++){
+          h ^= text.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return (h>>>0).toString(16);
+      };
+      return { escape, clamp, limiter, hash };
+    })();
+
+    // ==== Storage Layer ====
+    const DB = (() => {
+      const DB_NAME = "phd_conflict_monitor", DB_VER = 1;
+      let db = null;
+
+      function open(){
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(DB_NAME, DB_VER);
+          req.onupgradeneeded = () => {
+            const d = req.result;
+            const mk = (name) => {
+              if(!d.objectStoreNames.contains(name)) d.createObjectStore(name, { keyPath:"id" });
+            };
+            mk("settings"); mk("cache"); mk("sources"); mk("analytics");
+            mk("ontology"); mk("temporal"); mk("provenance"); mk("actions");
+            mk("adversarial"); mk("participatory"); mk("performance");
+          };
+          req.onsuccess = () => { db = req.result; resolve(db); };
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      function tx(store, mode="readonly"){
+        if(!db) throw new Error("DB not open");
+        return db.transaction(store, mode).objectStore(store);
+      }
+
+      function put(store, val){
+        return new Promise((resolve,reject)=>{
+          const r = tx(store, "readwrite").put(val);
+          r.onsuccess=()=>resolve(true);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+      function get(store, id){
+        return new Promise((resolve,reject)=>{
+          const r = tx(store).get(id);
+          r.onsuccess=()=>resolve(r.result ?? null);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+      function all(store){
+        return new Promise((resolve,reject)=>{
+          const r = tx(store).getAll();
+          r.onsuccess=()=>resolve(r.result ?? []);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+      function del(store, id){
+        return new Promise((resolve,reject)=>{
+          const r = tx(store, "readwrite").delete(id);
+          r.onsuccess=()=>resolve(true);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+      async function wipeAll(){
+        if(db) db.close();
+        await new Promise((resolve,reject)=>{
+          const r = indexedDB.deleteDatabase(DB_NAME);
+          r.onsuccess=()=>resolve(true);
+          r.onerror=()=>reject(r.error);
+          r.onblocked=()=>resolve(true);
+        });
+        db = null;
+      }
+
+      return { open, put, get, all, del, wipeAll };
+    })();
+
+    // ==== Service Worker ====
+    async function registerSW(){
+      const code = `
+        const CACHE = "phd-conflict-v1";
+        self.addEventListener("install", (e) => {
+          e.waitUntil((async () => {
+            const cache = await caches.open(CACHE);
+            try { await cache.addAll([self.registration.scope]); } catch{}
+            self.skipWaiting();
+          })());
+        });
+        self.addEventListener("activate", (e) => {
+          e.waitUntil((async () => {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => (k===CACHE)?null:caches.delete(k)));
+            self.clients.claim();
+          })());
+        });
+        self.addEventListener("fetch", (e) => {
+          if (e.request.mode === "navigate") {
+            e.respondWith((async () => {
+              const cache = await caches.open(CACHE);
+              const cached = await cache.match(self.registration.scope);
+              try {
+                const fresh = await fetch(e.request);
+                cache.put(self.registration.scope, fresh.clone());
+                return fresh;
+              } catch {
+                return cached || new Response("Offline", {status: 503});
+              }
+            })());
+          }
+        });
+      `;
+      try{
+        const blob = new Blob([code], {type:"text/javascript"});
+        const url = URL.createObjectURL(blob);
+        const reg = await navigator.serviceWorker.register(url, {scope: "./"});
+        return reg;
+      }catch(e){
+        return null;
+      }
+    }
+
+    // ==== Data Connectors ====
+    const CONNECTORS = [
+      {
+        id: "gdelt",
+        name: "GDELT 2.1 (אות חדשות גלובלי)",
+        kind: "ציבורי",
+        hint: "לעתים קרובות ידידותי-CORS. כיסוי מדיה רחב אבל לא אמת קרקע.",
+        enabledByDefault: true,
+        fields: [],
+        async fetch({windowDays, region}){
+          const now = new Date(), past = new Date(Date.now() - windowDays*24*3600*1000);
+          const fmt = (d)=> d.toISOString().slice(0,10).replaceAll("-","");
+          const start = fmt(past), end = fmt(now);
+          const regionQ = ({
+            world:"", europe:"theme:EUROPE", mena:"theme:MIDDLEEAST",
+            ssa:"theme:AFRICA", asia:"theme:ASIA", americas:"theme:AMERICAS"
+          })[region] || "";
+          const q = "(conflict OR ceasefire OR clashes OR humanitarian)" + (regionQ ? " AND " + regionQ : "");
+          const url = "https://api.gdeltproject.org/api/v2/doc/doc?format=json&mode=ArtList"
+            + "&query=" + encodeURIComponent(q)
+            + "&startdatetime=" + start + "000000"
+            + "&enddatetime=" + end + "235959"
+            + "&maxrecords=80&sort=HybridRel";
+          const r = await fetch(url, {mode:"cors"});
+          if(!r.ok) throw new Error("GDELT fetch failed");
+          const j = await r.json();
+          return (j?.articles || []).slice(0,80).map(a => ({
+            title: a.title || "ללא כותרת",
+            date: a.seendate || a.datetime || "",
+            location: (a.sourceCountry || "") + (a.location ? " • " + a.location : ""),
+            summary: a.snippet || a.description || "",
+            url: a.url || "",
+            tags: ["חדשות"]
+          }));
+        },
+        normalize(item){
+          return {
+            title: String(item.title || "").slice(0, 220),
+            time: parseTime(item.date),
+            location: String(item.location || ""),
+            summary: String(item.summary || "").slice(0, 900),
+            url: safeUrl(item.url),
+            tags: item.tags || [],
+            source: "GDELT",
+          };
+        }
+      },
+      {
+        id: "reliefweb",
+        name: "ReliefWeb (אות הומניטרי)",
+        kind: "ציבורי",
+        hint: "OCHA של האו\"ם. מצוין לפרספקטיבות מבוססות-צרכים.",
+        enabledByDefault: true,
+        fields: [],
+        async fetch({windowDays, region}){
+          const from = new Date(Date.now() - windowDays*24*3600*1000).toISOString();
+          const regionMap = {
+            world: null, europe: "europe", mena: "middle-east-and-north-africa",
+            ssa: "sub-saharan-africa", asia: "asia-and-the-pacific", americas: "americas"
+          };
+          const regionSlug = regionMap[region];
+          const filter = [{field:"date.created", value:{from}}];
+          if(regionSlug) filter.push({field:"primary_country.region", value:[regionSlug]});
+          const body = {
+            query: { value: "conflict OR displacement OR humanitarian" },
+            filter: filter.length ? {operator:"AND", conditions:filter} : undefined,
+            sort: ["date.created:desc"],
+            limit: 60,
+            fields: ["title","body","date","url","primary_country"]
+          };
+          const r = await fetch("https://api.reliefweb.int/v1/reports", {
+            method:"POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(body)
+          });
+          if(!r.ok) throw new Error("ReliefWeb failed");
+          const j = await r.json();
+          return (j?.data || []).slice(0,60).map(d => ({
+            title: d?.fields?.title || "ללא כותרת",
+            date: d?.fields?.date?.created || "",
+            location: (d?.fields?.primary_country?.map(c=>c.name).join(", ") || ""),
+            summary: stripHtml(d?.fields?.body || "").slice(0, 600),
+            url: d?.fields?.url || "",
+            tags: ["הומניטרי"]
+          }));
+        },
+        normalize(item){
+          return {
+            title: String(item.title || "").slice(0,220),
+            time: parseTime(item.date),
+            location: String(item.location || ""),
+            summary: String(item.summary || "").slice(0,900),
+            url: safeUrl(item.url),
+            tags: item.tags || ["הומניטרי"],
+            source: "ReliefWeb",
+          };
+        }
+      }
+    ];
+
+    // Helper functions
+    function parseTime(x){
+      if(!x) return null;
+      const d = new Date(String(x).trim());
+      if(!isNaN(d.getTime())) return d.getTime();
+      return null;
+    }
+    function stripHtml(html){
+      const div = document.createElement("div");
+      div.innerHTML = String(html||"");
+      return (div.textContent || "").trim();
+    }
+    function safeUrl(u){
+      const s = String(u||"").trim();
+      if(!s) return "";
+      try{
+        const url = new URL(s, location.href);
+        return (url.protocol==="http:" || url.protocol==="https:") ? url.href : "";
+      }catch{ return ""; }
+    }
+
+    // ==== Clustering Logic ====
+    function tokenize(s){
+      return (s||"").toLowerCase().replace(/[^a-z0-9\s]/g," ").split(/\s+/).filter(w => w.length >= 4).slice(0, 80);
+    }
+    function jaccard(a,b){
+      const A = new Set(a), B = new Set(b);
+      let inter=0;
+      for(const x of A) if(B.has(x)) inter++;
+      const union = A.size + B.size - inter;
+      return union ? inter/union : 0;
+    }
+    function clusterEvents(events){
+      const clusters = [];
+      for(const ev of events){
+        const tokens = tokenize(ev.title + " " + ev.location + " " + ev.summary);
+        const t = ev.time || 0;
+        let best = null, bestScore = 0;
+
+        for(const c of clusters){
+          const dt = Math.abs((c.time || t) - t);
+          const timeScore = (ev.time && c.time) ? Math.max(0, 1 - dt/(1000*3600*24*7)) : 0.55;
+          const sim = jaccard(tokens, c.tokens);
+          const locSim = jaccard(tokenize(ev.location), tokenize(c.locationHint));
+          const score = 0.55*sim + 0.25*timeScore + 0.20*locSim;
+          if(score > bestScore){ bestScore=score; best=c; }
+        }
+
+        if(best && bestScore >= 0.26){
+          best.items.push(ev);
+          best.tokens = new Set([...best.tokens, ...tokens]);
+          best.locationHint = best.locationHint || ev.location || "";
+          best.time = best.time || ev.time || null;
+          best.tags = new Set([...best.tags, ...(ev.tags||[])]);
+        } else {
+          clusters.push({
+            id: "c_" + Safe.hash((ev.title||"") + "|" + (ev.location||"") + "|" + String(ev.time||"")),
+            time: ev.time || null,
+            locationHint: ev.location || "",
+            tokens: new Set(tokens),
+            tags: new Set(ev.tags || []),
+            items: [ev]
+          });
+        }
+      }
+
+      return clusters.map(c => {
+        const sources = [...new Set(c.items.map(i=>i.source))];
+        const corroboration = Safe.clamp((sources.length - 1) / 3, 0, 1);
+        const metaQuality = Safe.clamp(
+          (avg(c.items.map(i=> i.url ? 1 : 0))*0.35) +
+          (avg(c.items.map(i=> i.location ? 1 : 0))*0.35) +
+          (avg(c.items.map(i=> i.time ? 1 : 0))*0.30),
+          0,1
+        );
+        const sims = [];
+        for(let i=0;i<c.items.length;i++){
+          for(let j=i+1;j<c.items.length;j++){
+            sims.push(jaccard(tokenize(c.items[i].title+" "+c.items[i].summary), tokenize(c.items[j].title+" "+c.items[j].summary)));
+          }
+        }
+        const cohesion = sims.length ? avg(sims) : 0.55;
+        const divergence = Safe.clamp(1 - cohesion, 0, 1);
+        const confidence = Safe.clamp(0.55*corroboration + 0.35*metaQuality + 0.10*(1-divergence), 0, 1);
+
+        return {
+          id: c.id,
+          time: c.time,
+          location: c.locationHint,
+          tags: [...c.tags],
+          items: c.items,
+          sources,
+          corroboration,
+          divergence,
+          confidence,
+          text: c.items.map(i=>i.title+" "+i.summary).join(" ")
+        };
+      }).sort((a,b) => (b.confidence - a.confidence) || ((b.time||0)-(a.time||0)));
+    }
+    function avg(xs){
+      if(!xs.length) return 0;
+      return xs.reduce((a,b)=>a+b,0)/xs.length;
+    }
+
+    // ==== Research Modules ====
+
+    // Module 1: Ontology Analysis
+    function analyzeOntology(clusters){
+      const frameworks = {
+        humanitarian: /\b(ihl|geneva|civilian|protected|proportionalit|humanitarian law|war crime|massacre)\b/i,
+        military: /\b(neutrali|target|combatant|collateral|roe|rules of engagement|operation|strike|raid)\b/i,
+        political: /\b(aggress|provoc|retaliat|legitima|sovereignty|intervention|regime|sanction)\b/i
+      };
+
+      return clusters.map(c => {
+        const text = c.text.toLowerCase();
+        const profile = {};
+        let total = 0;
+        for(const [name, regex] of Object.entries(frameworks)){
+          const matches = (text.match(regex) || []).length;
+          profile[name] = matches;
+          total += matches;
+        }
+        if(total > 0){
+          for(const k of Object.keys(profile)) profile[k] /= total;
+        }
+        const diversity = Object.values(profile).filter(v => v > 0.15).length;
+        return { ...c, ontology: profile, ontoDiversity: diversity };
+      });
+    }
+
+    // Module 2: Temporal Tracking
+    const TemporalTracker = {
+      history: [],
+      add(clusters){
+        this.history.push({time: Date.now(), clusters: clusters.map(c=>({id:c.id, divergence:c.divergence}))});
+        if(this.history.length > 50) this.history.shift();
+      },
+      analyze(){
+        if(this.history.length < 2) return [];
+        const alerts = [];
+        const recent = this.history.slice(-10);
+        for(let i=1; i<recent.length; i++){
+          const prev = recent[i-1], curr = recent[i];
+          const dt = (curr.time - prev.time) / 1000 / 60;
+          for(const c of curr.clusters){
+            const p = prev.clusters.find(x => x.id === c.id);
+            if(p){
+              const velocity = (p.divergence - c.divergence) / dt;
+              if(velocity < -0.02){
+                alerts.push({id: c.id, type: "rapid_convergence", velocity, time: curr.time});
+              }
+            }
+          }
+        }
+        return alerts;
+      }
+    };
+
+    // Module 3: Provenance Mapping
+    function mapProvenance(clusters){
+      const nodes = new Set();
+      const edges = [];
+      for(const c of clusters){
+        for(const item of c.items){
+          nodes.add(item.source);
+        }
+        for(let i=0; i<c.items.length; i++){
+          for(let j=i+1; j<c.items.length; j++){
+            const a = c.items[i], b = c.items[j];
+            let weight = 0;
+            if(a.url && b.url && a.url === b.url) weight += 1.0;
+            const timeDiff = Math.abs((a.time||0) - (b.time||0)) / 1000 / 60;
+            if(timeDiff < 60) weight += 0.4;
+            const textSim = jaccard(tokenize(a.title+" "+a.summary), tokenize(b.title+" "+b.summary));
+            if(textSim > 0.8) weight += 0.6;
+            if(weight > 0.3){
+              edges.push({from: a.source, to: b.source, weight});
+            }
+          }
+        }
+      }
+
+      const scores = {};
+      for(const node of nodes){
+        const deps = edges.filter(e => e.from === node || e.to === node);
+        const totalWeight = deps.reduce((s,e)=>s+e.weight, 0);
+        const possibleEdges = nodes.size - 1;
+        scores[node] = possibleEdges > 0 ? Safe.clamp(1 - totalWeight / possibleEdges, 0, 1) : 1;
+      }
+
+      return { nodes: [...nodes], edges, scores };
+    }
+
+    // Module 4: Action Thresholds
+    const ActionMatrix = {
+      actions: [
+        {name: "תמיכה בסיוע הומניטרי כללי", risk: 0.1, threshold: 0.35},
+        {name: "שיתוף סיכום זהיר ממקורות מרובים", risk: 0.2, threshold: 0.50},
+        {name: "הצטרפות לקמפיין תמיכה מאורגן", risk: 0.4, threshold: 0.65},
+        {name: "פנייה לנציגים למדיניות", risk: 0.7, threshold: 0.80},
+        {name: "הגברת טענות על אנשים בשמם", risk: 0.9, threshold: 0.90},
+      ],
+      getAvailable(confidence){
+        return this.actions.filter(a => confidence >= a.threshold);
+      },
+      generatePlan(cluster){
+        const available = this.getAvailable(cluster.confidence);
+        if(!available.length) return "ביטחון נמוך מדי לכל פעולות מומלצות.";
+        const plan = [
+          `אשכול: ${cluster.location} (${cluster.sources.length} מקורות, ביטחון ${(cluster.confidence*100).toFixed(0)}%)`,
+          "",
+          "פעולות זמינות על בסיס ביטחון:",
+          ...available.map(a => `• ${a.name} (רמת סיכון: ${(a.risk*100).toFixed(0)}%)`)
+        ];
+        return plan.join("\n");
+      }
+    };
+
+    // Module 5: Adversarial Simulation
+    function runRedTeam(scenario, realClusters){
+      const scenarios = {
+        coordinated: () => {
+          const fake = [
+            {title:"טסטיסטן: דווח על עימותים", date:"2026-01-01", location:"טסטיסטן", summary:"מקורות מרובים מדווחים על קרבות ליד הבירה", url:"", tags:["מלחמה"], source:"FakeSource1"},
+            {title:"סכסוך בטסטיסטן מתגבר", date:"2026-01-01", location:"טסטיסטן", summary:"הקרבות מתעצמים באזור טסטיסטן", url:"", tags:["מלחמה"], source:"FakeSource2"},
+            {title:"האלימות בטסטיסטן נמשכת", date:"2026-01-01", location:"טסטיסטן", summary:"עימותים מתמשכים באזור בירת טסטיסטן", url:"", tags:["מלחמה"], source:"FakeSource3"},
+          ];
+          return fake.map(CONNECTORS[0].normalize);
+        },
+      };
+      const synth = scenarios[scenario] ? scenarios[scenario]() : [];
+      const combined = [...realClusters.flatMap(c=>c.items), ...synth];
+      const testClusters = clusterEvents(combined);
+      const synthCluster = testClusters.find(c => c.items.some(i => i.source.startsWith("FakeSource")));
+      return {
+        detected: synthCluster && synthCluster.divergence < 0.4 && synthCluster.confidence > 0.65,
+        cluster: synthCluster,
+        message: synthCluster ? 
+          (synthCluster.divergence < 0.4 && synthCluster.confidence > 0.65 ?
+            "❌ נכשל: התקפה סינתטית לא סומנה. המערכת נתנה ביטחון גבוה לבדיה מתואמת." :
+            "✅ עבר: התקפה סינתטית סומנה כחשודה בשל דפוסי סטייה/ביטחון.") :
+          "פריטים סינתטיים לא התאגדו יחד."
+      };
+    }
+
+    // Module 6: Performance Testing
+    async function runPerformanceTest(){
+      const sizes = [100, 250, 500, 1000];
+      const results = [];
+      for(const n of sizes){
+        const fake = Array(n).fill(0).map((_,i) => ({
+          title: `אירוע ${i}`,
+          date: new Date(Date.now() - Math.random()*7*24*3600*1000).toISOString(),
+          location: ["אזור א","אזור ב","אזור ג"][i%3],
+          summary: `תיאור של אירוע ${i} עם כמה פרטים`,
+          url: `https://example.com/${i}`,
+          tags: ["בדיקה"],
+          source: "TestSource"
+        }));
+        const normed = fake.map(CONNECTORS[0].normalize);
+        const t0 = performance.now();
+        const clusters = clusterEvents(normed);
+        const t1 = performance.now();
+        results.push({n, time: t1-t0, clusters: clusters.length});
+      }
+      return results;
+    }
+
+    // ==== State Management ====
+    const State = {
+      settings: {
+        offlineCache: true,
+        autoRefresh: true,
+        localAnalytics: false,
+      },
+      sourceConfig: {},
+      lastFetchAt: null,
+      lastClusters: [],
+      analytics: { refreshes:0, modulesRun:0, lastDay: null, streak:0 },
+    };
+
+    async function loadState(){
+      const s = await DB.get("settings","app")?.catch(()=>null);
+      if(s?.value) Object.assign(State.settings, s.value);
+      const sc = await DB.get("sources","config")?.catch(()=>null);
+      if(sc?.value) State.sourceConfig = sc.value;
+      const cache = await DB.get("cache","last")?.catch(()=>null);
+      if(cache?.value){
+        State.lastFetchAt = cache.value.lastFetchAt || null;
+        State.lastClusters = cache.value.clusters || [];
+      }
+      const an = await DB.get("analytics","stats")?.catch(()=>null);
+      if(an?.value) State.analytics = an.value;
+    }
+
+    async function persistSettings(){
+      await DB.put("settings", {id:"app", value: State.settings});
+    }
+    async function persistCache(){
+      await DB.put("cache", {id:"last", value: { lastFetchAt: State.lastFetchAt, clusters: State.lastClusters }});
+    }
+    async function persistAnalytics(){
+      await DB.put("analytics", {id:"stats", value: State.analytics});
+    }
+
+    // ==== DOM Helpers ====
+    const $ = (id)=>document.getElementById(id);
+    function toast(msg){
+      const d=document.createElement("div");
+      d.textContent=msg;
+      d.style.cssText="position:fixed;right:50%;bottom:20px;transform:translateX(50%);background:rgba(0,0,0,.8);color:#fff;padding:8px 12px;border-radius:12px;z-index:200;font-size:13px";
+      document.body.appendChild(d);
+      setTimeout(()=>d.remove(),2400);
+    }
+
+    // ==== UI Rendering ====
+    function renderFeed(){
+      const clusters = State.lastClusters;
+      if(!clusters.length){
+        $("eventList").innerHTML = '<div class="tiny muted">אין נתונים עדיין. לחץ "רענן מקורות".</div>';
+        return;
+      }
+      $("eventList").innerHTML = clusters.slice(0,50).map(c => {
+        const t = c.time ? new Date(c.time).toLocaleString('he-IL') : "—";
+        const divTag = c.divergence >= 0.6 ? '<span class="tag bad">סטייה גבוהה</span>' :
+                       c.divergence >= 0.35 ? '<span class="tag warn">סטייה בינונית</span>' :
+                       '<span class="tag good">סטייה נמוכה</span>';
+        const conf = (c.confidence*100).toFixed(0)+"%";
+        return `
+          <div class="ev">
+            <div class="top">
+              <div>
+                <div class="ttl">${Safe.escape(c.items[0]?.title || "ללא כותרת")}</div>
+                <div class="meta">${Safe.escape(c.location||"")} • ${t}</div>
+              </div>
+              <div class="score"><b>${conf}</b></div>
+            </div>
+            <div class="desc">${Safe.escape(c.items[0]?.summary || "")}</div>
+            <div class="links">
+              ${divTag}
+              <span class="tag">מקורות: ${c.sources.length}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderSources(){
+      const cards = CONNECTORS.map(c => {
+        const cfg = State.sourceConfig[c.id] || { enabled: c.enabledByDefault };
+        return `
+          <div class="card" style="box-shadow:none">
+            <div class="hd">
+              <div>
+                <h4>${Safe.escape(c.name)}</h4>
+                <div class="tiny muted">${Safe.escape(c.hint)}</div>
+              </div>
+              <span class="pill">${Safe.escape(c.kind)}</span>
+            </div>
+            <div class="bd">
+              <label style="display:flex; align-items:center; gap:8px">
+                <input type="checkbox" data-cid="${c.id}" ${cfg.enabled?"checked":""}>
+                <span class="tiny">מופעל</span>
+              </label>
+            </div>
+          </div>
+        `;
+      }).join("");
+      $("sourceCards").innerHTML = cards;
+      $("sourceCards").querySelectorAll("input[data-cid]").forEach(inp => {
+        inp.addEventListener("change", async ()=>{
+          const cid = inp.getAttribute("data-cid");
+          if(!State.sourceConfig[cid]) State.sourceConfig[cid] = {};
+          State.sourceConfig[cid].enabled = inp.checked;
+          await DB.put("sources", {id:"config", value: State.sourceConfig});
+        });
+      });
+    }
+
+    function renderSettings(){
+      $("offlineCacheToggle").checked = !!State.settings.offlineCache;
+      $("autoRefreshToggle").checked = !!State.settings.autoRefresh;
+      $("localAnalyticsToggle").checked = !!State.settings.localAnalytics;
+    }
+
+    function renderHud(){
+      $("hudClusters").textContent = State.lastClusters.length;
+      $("hudRefreshes").textContent = State.analytics.refreshes || 0;
+      $("hudModules").textContent = `${State.analytics.modulesRun || 0}/7`;
+      $("hudStreak").textContent = State.analytics.streak || 0;
+      const momentum = Safe.clamp((State.lastClusters.length || 0)*2, 0, 100);
+      $("momentumBar").style.setProperty("--w", momentum+"%");
+    }
+
+    function updateHeaderPills(){
+      $("freshPill").textContent = State.lastFetchAt ? new Date(State.lastFetchAt).toLocaleTimeString('he-IL') : "—";
+      $("divPill").textContent = State.lastClusters.length ? (avg(State.lastClusters.map(c=>c.divergence))*100).toFixed(0)+"%" : "—";
+      $("cachePill").textContent = State.settings.offlineCache ? "פועל" : "כבוי";
+      
+      if(State.lastClusters.length && State.lastClusters[0].ontoDiversity !== undefined){
+        $("ontoPill").textContent = avg(State.lastClusters.map(c=>c.ontoDiversity||0)).toFixed(1);
+      }
+      
+      const provData = JSON.parse(sessionStorage.getItem("provenance") || "null");
+      if(provData?.scores){
+        const indep = avg(Object.values(provData.scores));
+        $("provPill").textContent = (indep*100).toFixed(0)+"%";
+      }
+    }
+
+    // ==== Core Operations ====
+    async function refreshSources(){
+      if(!Safe.limiter.allow()){
+        toast("הגבלת קצב - אנא המתן לפני רענון נוסף");
+        return;
+      }
+
+      const params = {
+        windowDays: +$("window").value,
+        region: $("region").value,
+      };
+
+      const allEvents = [];
+      let ok=0, fail=0;
+
+      for(const c of CONNECTORS){
+        const cfg = State.sourceConfig[c.id] || {enabled: c.enabledByDefault};
+        if(!cfg.enabled) continue;
+        try{
+          const items = await c.fetch(params);
+          const normed = items.map(it=>c.normalize(it)).filter(x=>x.title || x.summary);
+          allEvents.push(...normed);
+          ok++;
+        }catch(e){
+          console.warn("Source failed:", c.id, e);
+          fail++;
+        }
+      }
+
+      const clusters = clusterEvents(allEvents);
+      State.lastFetchAt = Date.now();
+      State.lastClusters = clusters;
+      State.analytics.refreshes++;
+
+      if(State.settings.offlineCache) await persistCache();
+      if(State.settings.localAnalytics) await persistAnalytics();
+
+      $("srcOk").textContent = ok;
+      $("srcPartial").textContent = 0;
+      $("srcFail").textContent = fail;
+      $("clusterCount").textContent = clusters.length;
+
+      TemporalTracker.add(clusters);
+
+      renderFeed();
+      updateHeaderPills();
+      renderHud();
+      drawHealthViz();
+      updatePlanClusterOptions();
+      toast(`רוענן: ${ok} מקורות תקינים, ${fail} נכשלו`);
+    }
+
+    async function useCache(){
+      if(State.lastClusters?.length){
+        renderFeed();
+        updateHeaderPills();
+        renderHud();
+        drawHealthViz();
+        toast("נתונים מהמטמון נטענו");
+      } else {
+        toast("אין נתוני מטמון זמינים");
+      }
+    }
+
+    function exportJSON(){
+      const data = {
+        generated: new Date().toISOString(),
+        clusters: State.lastClusters.map(c => ({
+          id: c.id,
+          confidence: c.confidence,
+          divergence: c.divergence,
+          location: c.location,
+          time: c.time,
+          sources: c.sources,
+          items: c.items.map(i => ({
+            title: i.title,
+            summary: i.summary,
+            url: i.url,
+            source: i.source
+          }))
+        }))
+      };
+      const blob = new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+      const a = document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="conflict_analysis_export.json";
+      a.click();
+      toast("ייצוא הורד");
+    }
+
+    // ==== Research Module Functions ====
+    async function runOntologyAnalysis(){
+      if(!State.lastClusters.length){
+        toast("אין נתונים לניתוח. רענן תחילה.");
+        return;
+      }
+      const analyzed = analyzeOntology(State.lastClusters);
+      State.lastClusters = analyzed;
+      
+      await DB.put("ontology", {id:"last", value: analyzed});
+      
+      const results = analyzed.map(c => {
+        const profile = Object.entries(c.ontology || {})
+          .map(([k,v]) => `${k}: ${(v*100).toFixed(0)}%`)
+          .join(", ");
+        return `
+          <div style="margin-bottom:12px; padding:10px; background:rgba(0,0,0,.2); border-radius:12px">
+            <div class="tiny"><b>${Safe.escape(c.location || "לא ידוע")}</b></div>
+            <div class="tiny muted" style="margin-top:4px">${profile || "לא זוהתה מסגרת ברורה"}</div>
+            <div class="tiny muted">גיוון מסגרת: ${c.ontoDiversity || 0} (${c.ontoDiversity >= 2 ? "התנגשות סבירה" : "עקבי"})</div>
+          </div>
+        `;
+      }).slice(0,10).join("");
+      
+      $("ontoResultsBox").innerHTML = results || '<div class="muted">לא זוהו דפוסים אונטולוגיים</div>';
+      
+      drawOntologyMatrix(analyzed);
+      updateHeaderPills();
+      State.analytics.modulesRun++;
+      persistAnalytics();
+      toast("ניתוח אונטולוגי הושלם");
+    }
+
+    function runTemporalTracking(){
+      const alerts = TemporalTracker.analyze();
+      if(!alerts.length){
+        $("tempAlertsBox").innerHTML = '<div class="muted">לא זוהתה התכנסות מהירה. זה נורמלי.</div>';
+      } else {
+        $("tempAlertsBox").innerHTML = alerts.map(a => `
+          <div class="tag warn" style="display:block; margin-bottom:8px">
+            <b>התראה:</b> אשכול ${a.id} - התכנסות מהירה (מהירות: ${a.velocity.toFixed(3)}/דקה)
+            <div class="tiny" style="margin-top:4px">זה יכול להיות בניית קונצנזוס טבעית או הודעות מתואמות</div>
+          </div>
+        `).join("");
+      }
+      drawTemporalViz();
+      State.analytics.modulesRun++;
+      persistAnalytics();
+      toast("מעקב זמני עודכן");
+    }
+
+    function runProvenanceMapping(){
+      if(!State.lastClusters.length){
+        toast("אין נתונים לניתוח");
+        return;
+      }
+      const prov = mapProvenance(State.lastClusters);
+      sessionStorage.setItem("provenance", JSON.stringify(prov));
+      
+      const scores = Object.entries(prov.scores)
+        .sort((a,b) => b[1]-a[1])
+        .map(([source, score]) => `
+          <div style="margin-bottom:8px">
+            <div class="tiny"><b>${Safe.escape(source)}</b></div>
+            <div class="meter" style="height:6px; margin-top:4px">
+              <i style="--w: ${(score*100).toFixed(0)}%; background:${score>0.7?'var(--good)':score>0.4?'var(--warn)':'var(--bad)'}"></i>
+            </div>
+            <div class="tiny muted">עצמאות: ${(score*100).toFixed(0)}%</div>
+          </div>
+        `).join("");
+      
+      $("provScoresBox").innerHTML = scores;
+      drawProvenanceGraph(prov);
+      updateHeaderPills();
+      State.analytics.modulesRun++;
+      persistAnalytics();
+      toast("מיפוי מקור הושלם");
+    }
+
+    function calculateActionThresholds(){
+      if(!State.lastClusters.length){
+        toast("אין אשכולות זמינים");
+        return;
+      }
+      drawActionMatrix();
+      updatePlanClusterOptions();
+      State.analytics.modulesRun++;
+      persistAnalytics();
+      toast("ספי פעולה חושבו");
+    }
+
+    function updatePlanClusterOptions(){
+      const opts = State.lastClusters.slice(0,20).map(c => 
+        `<option value="${c.id}">${Safe.escape((c.location||"") + " - " + (c.items[0]?.title||"").slice(0,50))}</option>`
+      ).join("");
+      $("planCluster").innerHTML = opts || '<option>אין אשכולות</option>';
+    }
+
+    function generateActionPlan(){
+      const cid = $("planCluster").value;
+      const cluster = State.lastClusters.find(c => c.id === cid);
+      if(!cluster){
+        $("actPlansBox").innerHTML = '<div class="muted">בחר אשכול</div>';
+        return;
+      }
+      const plan = ActionMatrix.generatePlan(cluster);
+      $("actPlansBox").innerHTML = '<pre style="white-space:pre-wrap; direction:rtl; text-align:right">' + Safe.escape(plan) + '</pre>';
+    }
+
+    async function runAdversarialTest(){
+      const scenario = document.querySelector('input[name="advScenario"]:checked')?.value || "coordinated";
+      if(!State.lastClusters.length){
+        toast("צריך נתונים אמיתיים תחילה. רענן מקורות.");
+        return;
+      }
+      
+      const result = runRedTeam(scenario, State.lastClusters);
+      
+      const html = `
+        <div class="card" style="box-shadow:none; background:${result.detected?'rgba(125,255,178,.08)':'rgba(255,125,155,.08)'}">
+          <div class="hd">
+            <h4>תוצאת סימולציה: ${scenario}</h4>
+          </div>
+          <div class="bd">
+            <div style="font-size:18px; margin-bottom:12px">${result.message}</div>
+            ${result.cluster ? `
+              <div class="tiny muted">
+                ביטחון אשכול סינתטי: ${(result.cluster.confidence*100).toFixed(0)}%<br>
+                סטיית אשכול סינתטי: ${(result.cluster.divergence*100).toFixed(0)}%<br>
+                מקורות באשכול: ${result.cluster.sources.length}
+              </div>
+            ` : ''}
+            <div class="sep"></div>
+            <div class="tiny muted">
+              <b>פרשנות:</b> ${result.detected ? 
+                "ניקוד הסטייה + ביטחון של המערכת שלך סימן בהצלחה את ההתקפה המתואמת כחשודה." :
+                "ההתקפה המתואמת השיגה ביטחון גבוה, מה שמציע שהמערכת שלך עלולה להיות פגיעה לדפוס התקפה זה. שקול: (1) בדיקת מקור חזקה יותר, (2) זיהוי אנומליית מהירות, (3) ניתוח עקביות בין-מסגרתי."
+              }
+            </div>
+          </div>
+        </div>
+      `;
+      
+      $("advResultsBox").innerHTML = html;
+      State.analytics.modulesRun++;
+      persistAnalytics();
+      toast("סימולציית צוות אדום הושלמה");
+    }
+
+    // Participatory functions
+    async function submitCommunityKnowledge(){
+      if(!$("partConsent").checked){
+        toast("אנא אשר את תיבת ההסכמה");
+        return;
+      }
+      
+      const data = {
+        id: "part_" + Date.now(),
+        type: $("partType").value,
+        location: $("partLocation").value,
+        time: $("partTime").value,
+        content: $("partContent").value,
+        anonymous: $("partAnon").checked,
+        submitted: Date.now()
+      };
+      
+      await DB.put("participatory", data);
+      
+      $("partContent").value = "";
+      $("partLocation").value = "";
+      $("partTime").value = "";
+      
+      toast("ההגשה נשמרה מקומית (מוצפן)");
+      renderParticipatory();
+    }
+
+    async function renderParticipatory(){
+      const subs = await DB.all("participatory");
+      if(!subs.length){
+        $("partReviewBox").innerHTML = '<div class="muted">אין הגשות עדיין</div>';
+        return;
+      }
+      
+      $("partReviewBox").innerHTML = subs.map(s => `
+        <div style="margin-bottom:12px; padding:10px; background:rgba(0,0,0,.2); border-radius:12px">
+          <div class="tiny"><b>${Safe.escape(s.type)}</b> ${s.anonymous ? '(אנונימי)' : ''}</div>
+          <div class="tiny muted" style="margin-top:4px">
+            ${s.location ? Safe.escape(s.location) + " • " : ""}
+            ${s.time ? Safe.escape(s.time) + " • " : ""}
+            ${new Date(s.submitted).toLocaleDateString('he-IL')}
+          </div>
+          <div class="tiny" style="margin-top:8px">${Safe.escape(s.content.slice(0,200))}${s.content.length>200?"...":""}</div>
+        </div>
+      `).join("");
+    }
+
+    async function clearAllParticipatory(){
+      const subs = await DB.all("participatory");
+      for(const s of subs) await DB.del("participatory", s.id);
+      renderParticipatory();
+      toast("כל ההגשות נוקו");
+    }
+
+    // Performance testing
+    async function runPerformanceTests(){
+      toast("מריץ בדיקות עומס (עשוי לקחת 10-20 שניות)...");
+      const results = await runPerformanceTest();
+      
+      const html = results.map(r => `
+        <div style="margin-bottom:8px">
+          <div class="tiny"><b>${r.n} אירועים</b> → ${r.time.toFixed(1)}ms (${r.clusters} אשכולות)</div>
+          <div class="meter" style="height:6px; margin-top:4px">
+            <i style="--w: ${Math.min(100, r.time/20).toFixed(0)}%; background:${r.time<1000?'var(--good)':r.time<2000?'var(--warn)':'var(--bad)'}"></i>
+          </div>
+        </div>
+      `).join("");
+      
+      $("perfMetricsBox").innerHTML = html;
+      drawPerfScaling(results);
+      State.analytics.modulesRun++;
+      persistAnalytics();
+      toast("בדיקות ביצועים הושלמו");
+    }
+
+    // ==== Canvas Visualizations ====
+    function drawHealthViz(){
+      const canvas = $("healthViz");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+      
+      const nodes = [
+        {x:0.25, y:0.5, r:8, label:"משיכה", color:"rgba(124,247,197,.9)"},
+        {x:0.5, y:0.3, r:8, label:"אשכול", color:"rgba(134,183,255,.9)"},
+        {x:0.75, y:0.5, r:8, label:"ניתוח", color:"rgba(212,165,255,.9)"},
+        {x:0.5, y:0.7, r:8, label:"אחסון", color:"rgba(255,210,125,.9)"},
+      ];
+      
+      ctx.strokeStyle = "rgba(124,247,197,.3)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      nodes.forEach((n,i) => {
+        const next = nodes[(i+1)%nodes.length];
+        ctx.moveTo(n.x*w, n.y*h);
+        ctx.lineTo(next.x*w, next.y*h);
+      });
+      ctx.stroke();
+      
+      nodes.forEach(n => {
+        ctx.fillStyle = n.color;
+        ctx.beginPath();
+        ctx.arc(n.x*w, n.y*h, n.r, 0, Math.PI*2);
+        ctx.fill();
+        
+        ctx.fillStyle = "rgba(255,255,255,.9)";
+        ctx.font = "11px ui-sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(n.label, n.x*w, n.y*h - 14);
+      });
+    }
+
+    function drawOntologyMatrix(clusters){
+      const canvas = $("ontoCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+      
+      const frameworks = ["humanitarian", "military", "political"];
+      const cellW = 60, cellH = 30;
+      const startX = 120, startY = 40;
+      
+      ctx.fillStyle = "rgba(255,255,255,.7)";
+      ctx.font = "11px ui-sans-serif";
+      frameworks.forEach((f,i) => {
+        ctx.fillText(f, startX + i*cellW + cellW/2, startY - 10);
+      });
+      
+      clusters.slice(0,10).forEach((c,row) => {
+        ctx.fillText(c.location.slice(0,15), 10, startY + row*cellH + cellH/2 + 4);
+        
+        frameworks.forEach((f,col) => {
+          const val = c.ontology?.[f] || 0;
+          ctx.fillStyle = `rgba(124,247,197,${val})`;
+          ctx.fillRect(startX + col*cellW, startY + row*cellH, cellW-2, cellH-2);
+        });
+      });
+    }
+
+    function drawTemporalViz(){
+      const canvas = $("tempCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+      
+      if(TemporalTracker.history.length < 2){
+        ctx.fillStyle = "rgba(255,255,255,.5)";
+        ctx.font = "13px ui-sans-serif";
+        ctx.fillText("אין מספיק נתונים זמניים עדיין. רענן כמה פעמים לאורך זמן.", 20, h/2);
+        return;
+      }
+      
+      const history = TemporalTracker.history.slice(-10);
+      const topClusters = State.lastClusters.slice(0,5);
+      
+      const marginL = 50, marginR = 20, marginT = 20, marginB = 30;
+      const plotW = w - marginL - marginR;
+      const plotH = h - marginT - marginB;
+      
+      ctx.strokeStyle = "rgba(255,255,255,.2)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(marginL, marginT);
+      ctx.lineTo(marginL, h-marginB);
+      ctx.lineTo(w-marginR, h-marginB);
+      ctx.stroke();
+      
+      ctx.fillStyle = "rgba(255,255,255,.6)";
+      ctx.font = "10px ui-sans-serif";
+      ctx.fillText("זמן ←", w-marginR-30, h-marginB+20);
+      ctx.save();
+      ctx.translate(15, h/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.fillText("סטייה", 0, 0);
+      ctx.restore();
+      
+      const colors = ["rgba(124,247,197,.8)", "rgba(134,183,255,.8)", "rgba(212,165,255,.8)", "rgba(255,210,125,.8)", "rgba(255,171,112,.8)"];
+      topClusters.forEach((cluster, cidx) => {
+        const points = [];
+        history.forEach((snap, idx) => {
+          const c = snap.clusters.find(x => x.id === cluster.id);
+          if(c){
+            const x = marginL + (idx / (history.length-1)) * plotW;
+            const y = marginT + (1 - c.divergence) * plotH;
+            points.push({x,y});
+          }
+        });
+        
+        if(points.length > 1){
+          ctx.strokeStyle = colors[cidx % colors.length];
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(points[0].x, points[0].y);
+          for(let i=1; i<points.length; i++){
+            ctx.lineTo(points[i].x, points[i].y);
+          }
+          ctx.stroke();
+        }
+      });
+    }
+
+    function drawProvenanceGraph(prov){
+      const canvas = $("provCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+      
+      const positions = {};
+      [...prov.nodes].forEach((node, i) => {
+        const angle = (i / prov.nodes.length) * Math.PI * 2;
+        const radius = Math.min(w,h) * 0.35;
+        positions[node] = {
+          x: w/2 + Math.cos(angle) * radius,
+          y: h/2 + Math.sin(angle) * radius
+        };
+      });
+      
+      prov.edges.forEach(e => {
+        const from = positions[e.from];
+        const to = positions[e.to];
+        if(from && to){
+          ctx.strokeStyle = `rgba(255,125,155,${e.weight})`;
+          ctx.lineWidth = 1 + e.weight * 3;
+          ctx.beginPath();
+          ctx.moveTo(from.x, from.y);
+          ctx.lineTo(to.x, to.y);
+          ctx.stroke();
+        }
+      });
+      
+      prov.nodes.forEach(node => {
+        const pos = positions[node];
+        const score = prov.scores[node] || 0.5;
+        ctx.fillStyle = score > 0.7 ? "rgba(125,255,178,.9)" : score > 0.4 ? "rgba(255,210,125,.9)" : "rgba(255,125,155,.9)";
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 8, 0, Math.PI*2);
+        ctx.fill();
+        
+        ctx.fillStyle = "rgba(255,255,255,.9)";
+        ctx.font = "10px ui-sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(node.slice(0,10), pos.x, pos.y - 12);
+      });
+    }
+
+    function drawActionMatrix(){
+      const canvas = $("actCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+      
+      const actions = ActionMatrix.actions;
+      const confLevels = [0, 0.25, 0.5, 0.75, 1.0];
+      
+      const cellW = 80, cellH = 40;
+      const startX = 220, startY = 40;
+      
+      ctx.fillStyle = "rgba(255,255,255,.7)";
+      ctx.font = "10px ui-sans-serif";
+      confLevels.forEach((c,i) => {
+        ctx.fillText(`${(c*100).toFixed(0)}%`, startX + i*cellW + cellW/2, startY - 10);
+      });
+      
+      actions.forEach((action, row) => {
+        ctx.fillText(action.name.slice(0,20), 10, startY + row*cellH + cellH/2 + 4);
+        
+        confLevels.forEach((conf, col) => {
+          const appropriate = conf >= action.threshold;
+          ctx.fillStyle = appropriate ? "rgba(125,255,178,.6)" : "rgba(255,125,155,.3)";
+          ctx.fillRect(startX + col*cellW, startY + row*cellH, cellW-2, cellH-2);
+        });
+      });
+    }
+
+    function drawPerfScaling(results){
+      const canvas = $("perfCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+      
+      const marginL = 60, marginR = 20, marginT = 20, marginB = 40;
+      const plotW = w - marginL - marginR;
+      const plotH = h - marginT - marginB;
+      
+      ctx.strokeStyle = "rgba(255,255,255,.2)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(marginL, marginT);
+      ctx.lineTo(marginL, h-marginB);
+      ctx.lineTo(w-marginR, h-marginB);
+      ctx.stroke();
+      
+      ctx.fillStyle = "rgba(255,255,255,.6)";
+      ctx.font = "10px ui-sans-serif";
+      ctx.fillText("גודל מערך נתונים", w/2, h-marginB+25);
+      ctx.save();
+      ctx.translate(20, h/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.fillText("זמן (ms)", 0, 0);
+      ctx.restore();
+      
+      const maxN = Math.max(...results.map(r=>r.n));
+      const maxT = Math.max(...results.map(r=>r.time));
+      
+      ctx.fillStyle = "rgba(124,247,197,.8)";
+      results.forEach(r => {
+        const x = marginL + (r.n / maxN) * plotW;
+        const y = h - marginB - (r.time / maxT) * plotH;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI*2);
+        ctx.fill();
+      });
+      
+      if(maxT > 2000){
+        const y = h - marginB - (2000 / maxT) * plotH;
+        ctx.strokeStyle = "rgba(255,125,155,.5)";
+        ctx.setLineDash([5,5]);
+        ctx.beginPath();
+        ctx.moveTo(marginL, y);
+        ctx.lineTo(w-marginR, y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "rgba(255,125,155,.8)";
+        ctx.fillText("סף UX (2 שניות)", w-marginR-80, y-5);
+      }
+    }
+
+    // ==== Tab System ====
+    function initTabs(){
+      document.querySelectorAll(".tabs button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const parent = btn.closest(".bd") || btn.closest(".card");
+          const tabName = btn.getAttribute("data-tab");
+          
+          parent.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          
+          parent.querySelectorAll(".tabContent").forEach(tc => tc.classList.remove("active"));
+          const target = parent.querySelector("#" + tabName);
+          if(target) target.classList.add("active");
+        });
+      });
+    }
+
+    // ==== HUD ====
+    function makeHudDraggable(hud){
+      let x=0,y=0,drag=false;
+      hud.addEventListener("pointerdown",e=>{
+        if(e.target.tagName === "BUTTON") return;
+        drag=true;x=e.clientX;y=e.clientY;hud.setPointerCapture(e.pointerId);
+      });
+      hud.addEventListener("pointermove",e=>{
+        if(!drag) return;
+        const dx=e.clientX-x, dy=e.clientY-y;
+        const r=hud.getBoundingClientRect();
+        hud.style.left="auto";
+        hud.style.bottom="auto";
+        hud.style.right=(window.innerWidth - r.right - dx)+"px";
+        hud.style.top=(r.top+dy)+"px";
+        x=e.clientX;y=e.clientY;
+      });
+      hud.addEventListener("pointerup",()=>drag=false);
+    }
+
+    // ==== Initialization ====
+    (async function boot(){
+      await DB.open();
+      await loadState();
+      if("serviceWorker" in navigator) await registerSW();
+      
+      renderSources();
+      renderSettings();
+      renderFeed();
+      renderHud();
+      updateHeaderPills();
+      drawHealthViz();
+      renderParticipatory();
+      initTabs();
+      makeHudDraggable($("hud"));
+      
+      const seen = await DB.get("settings", "splashSeen");
+      if(seen?.value){
+        $("splash").classList.add("hide");
+        setTimeout(()=>$("splash").style.display="none", 600);
+      }
+      
+      window.addEventListener("pointermove", (e)=>{
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 16;
+        $("parallaxBg").style.setProperty("--px", x+"px");
+        $("parallaxBg").style.setProperty("--py", y+"px");
+      }, {passive:true});
+      
+      $("enterBtn").addEventListener("click", async ()=>{
+        await DB.put("settings", {id:"splashSeen", value:true});
+        $("splash").classList.add("hide");
+        setTimeout(()=>$("splash").style.display="none", 600);
+      });
+      
+      $("resetLocalBtn").addEventListener("click", async ()=>{
+        if(confirm("למחוק את כל הנתונים המקומיים?")){ await DB.wipeAll(); location.reload(); }
+      });
+      
+      $("refreshBtn").addEventListener("click", refreshSources);
+      $("useCacheBtn").addEventListener("click", useCache);
+      $("exportBtn").addEventListener("click", exportJSON);
+      
+      $("analyzeOntologyBtn").addEventListener("click", runOntologyAnalysis);
+      $("trackTemporalBtn").addEventListener("click", runTemporalTracking);
+      $("mapProvenanceBtn").addEventListener("click", runProvenanceMapping);
+      $("calculateThresholdsBtn").addEventListener("click", calculateActionThresholds);
+      $("runRedTeamBtn").addEventListener("click", runAdversarialTest);
+      $("runPerfTestBtn").addEventListener("click", runPerformanceTests);
+      
+      $("planCluster").addEventListener("change", generateActionPlan);
+      
+      $("submitPartBtn").addEventListener("click", submitCommunityKnowledge);
+      $("clearPartFormBtn").addEventListener("click", ()=>{
+        $("partContent").value = "";
+        $("partLocation").value = "";
+        $("partTime").value = "";
+      });
+      $("clearAllPartBtn").addEventListener("click", clearAllParticipatory);
+      
+      $("offlineCacheToggle").addEventListener("change", async ()=>{
+        State.settings.offlineCache = $("offlineCacheToggle").checked;
+        await persistSettings();
+      });
+      
+      $("autoRefreshToggle").addEventListener("change", async ()=>{
+        State.settings.autoRefresh = $("autoRefreshToggle").checked;
+        await persistSettings();
+      });
+      
+      $("localAnalyticsToggle").addEventListener("change", async ()=>{
+        State.settings.localAnalytics = $("localAnalyticsToggle").checked;
+        await persistSettings();
+      });
+      
+      $("resetAnalyticsBtn").addEventListener("click", async ()=>{
+        State.analytics = { refreshes:0, modulesRun:0, lastDay:null, streak:0 };
+        await persistAnalytics();
+        renderHud();
+        toast("הניתוח אופס");
+      });
+      
+      $("swStatusBtn").addEventListener("click", async ()=>{
+        const regs = await navigator.serviceWorker.getRegistrations();
+        toast(regs.length ? "Service Worker פעיל" : "אין SW רשום");
+      });
+      
+      $("wipeAllBtn").addEventListener("click", async ()=>{
+        if(confirm("למחוק את כל הנתונים המקומיים?")){ await DB.wipeAll(); location.reload(); }
+      });
+      
+      $("minHudBtn").addEventListener("click", ()=>$("hud").classList.toggle("min"));
+      $("hudQuickRefresh").addEventListener("click", refreshSources);
+      $("hudSnapshot").addEventListener("click", ()=>toast("צילום מסך נשמר (מקומי)"));
+      
+      if(State.settings.autoRefresh){
+        setTimeout(refreshSources, 800);
+      } else if(State.lastClusters.length){
+        renderFeed();
+        updateHeaderPills();
+        drawHealthViz();
+      }
+    })();
+  </script>
+</body>
+</html>
