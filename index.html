@@ -1,0 +1,2486 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <title>Conflict Redundancy Dashboard — Anti-Disinformation, Peace Actionability</title>
+  <style>
+    /* =========================================================
+       TOOLTIP: Global Styling + Print
+       What it is: Theme tokens and base styles.
+       What it does: Provides consistent UI, parallax, and print output.
+       How to extend: Adjust :root tokens or add new layout utilities.
+       Outcome: Clean, readable dashboard with offline-friendly layout.
+    ========================================================== */
+    :root{
+      --bg0:#070A12;
+      --bg1:#0C1222;
+      --card:#0F1A2E;
+      --card2:#0B1426;
+      --txt:#EAF1FF;
+      --muted:#A9B7D6;
+      --faint:#7C89A6;
+      --accent:#7CF7C5;
+      --accent2:#86B7FF;
+      --warn:#FFD27D;
+      --bad:#FF7D9B;
+      --good:#7DFFB2;
+      --line:rgba(255,255,255,.12);
+      --shadow: 0 16px 50px rgba(0,0,0,.45);
+      --radius: 18px;
+      --radius2: 26px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--txt);
+      background: radial-gradient(1200px 700px at 20% 10%, rgba(134,183,255,.18), transparent 55%),
+                  radial-gradient(900px 600px at 80% 20%, rgba(124,247,197,.12), transparent 50%),
+                  linear-gradient(180deg,var(--bg0),var(--bg1));
+      overflow-x:hidden;
+    }
+    a{color:var(--accent2); text-decoration:none}
+    a:hover{text-decoration:underline}
+    code,pre{font-family:var(--mono)}
+    .wrap{max-width:1200px; margin:0 auto; padding:18px 16px 70px}
+    .row{display:flex; gap:14px; flex-wrap:wrap}
+    .col{flex:1 1 320px}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(8px);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .card .bd{padding:14px}
+    .pill{
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      color:var(--muted);
+      background: rgba(0,0,0,.18);
+      display:inline-flex; align-items:center; gap:8px;
+      white-space:nowrap;
+    }
+    .pill b{color:var(--txt); font-weight:650}
+    .btn{
+      appearance:none; border:1px solid var(--line);
+      background: rgba(0,0,0,.20);
+      color:var(--txt);
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      transition: transform .06s ease, border-color .2s ease, background .2s ease;
+      font-weight:650;
+    }
+    .btn:hover{border-color:rgba(255,255,255,.24); background: rgba(0,0,0,.28)}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{border-color: rgba(124,247,197,.35); background: rgba(124,247,197,.14)}
+    .btn.primary:hover{border-color: rgba(124,247,197,.55); background: rgba(124,247,197,.18)}
+    .btn.danger{border-color: rgba(255,125,155,.38); background: rgba(255,125,155,.14)}
+    .btn.danger:hover{border-color: rgba(255,125,155,.55); background: rgba(255,125,155,.18)}
+    .btn.small{padding:7px 10px; border-radius:12px; font-size:12px}
+    .muted{color:var(--muted)}
+    .faint{color:var(--faint)}
+    h1,h2,h3{margin:0}
+    h1{font-size:22px; letter-spacing:.2px}
+    h2{font-size:16px}
+    h3{font-size:14px}
+    .k{font-family:var(--mono); font-size:12px; color:var(--muted)}
+    .sep{height:1px; background:var(--line); margin:12px 0}
+    .grid2{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+    .grid3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px}
+    @media (max-width: 900px){
+      .grid2,.grid3{grid-template-columns:1fr}
+    }
+    input,select,textarea{
+      width:100%;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.22);
+      color:var(--txt);
+      padding:10px 12px;
+      outline:none;
+    }
+    textarea{min-height:96px; resize:vertical}
+    label{display:block; font-size:12px; color:var(--muted); margin:8px 0 6px}
+    .tiny{font-size:12px}
+    .tag{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 8px; border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.22);
+      font-size:12px; color:var(--muted);
+      margin:3px 6px 0 0;
+    }
+    .tag.good{border-color: rgba(125,255,178,.35); color: var(--good)}
+    .tag.warn{border-color: rgba(255,210,125,.35); color: var(--warn)}
+    .tag.bad{border-color: rgba(255,125,155,.35); color: var(--bad)}
+    .mono{font-family:var(--mono)}
+    .right{display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap}
+
+    /* Sticky Nav / TOC */
+    .topbar{
+      position:sticky; top:0; z-index:30;
+      background: linear-gradient(180deg, rgba(7,10,18,.92), rgba(7,10,18,.58));
+      border-bottom:1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+    .topbar .inner{
+      max-width:1200px; margin:0 auto; padding:10px 16px;
+      display:flex; align-items:center; gap:12px; justify-content:space-between;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; min-width: 260px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius:12px;
+      background: radial-gradient(circle at 30% 30%, rgba(124,247,197,.9), rgba(134,183,255,.35) 40%, rgba(0,0,0,.0) 70%),
+                  linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow: 0 12px 26px rgba(0,0,0,.45);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo::after{
+      content:"";
+      position:absolute; inset:-20px;
+      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,.18), transparent 55%);
+      transform: rotate(20deg);
+    }
+    .nav{
+      display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+    }
+    .nav a{
+      font-size:12px; color:var(--muted);
+      padding:7px 10px;
+      border:1px solid transparent;
+      border-radius:999px;
+    }
+    .nav a:hover{color:var(--txt); border-color: var(--line); background: rgba(0,0,0,.2); text-decoration:none}
+    .searchBox{min-width:260px; max-width:360px; width:35vw}
+    .searchBox input{padding:9px 12px; border-radius:999px}
+
+    /* Parallax sections */
+    .hero{
+      position:relative;
+      border-radius: var(--radius2);
+      overflow:hidden;
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+      margin-top:16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    }
+    .hero .bg{
+      position:absolute; inset:-60px;
+      background:
+        radial-gradient(800px 380px at 20% 20%, rgba(134,183,255,.22), transparent 60%),
+        radial-gradient(700px 360px at 80% 40%, rgba(124,247,197,.16), transparent 60%),
+        radial-gradient(420px 280px at 55% 85%, rgba(255,210,125,.12), transparent 60%);
+      transform: translate3d(var(--px,0), var(--py,0), 0) scale(1.02);
+      filter: saturate(1.05);
+    }
+    .hero .fg{
+      position:relative;
+      padding:18px 16px 14px;
+    }
+    .hero .title{
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+    }
+    .hero p{margin:8px 0 0; color:var(--muted); max-width: 82ch; line-height:1.4}
+    .hero .badges{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end}
+
+    /* HUD */
+    .hud{
+      position:fixed; right:14px; bottom:14px; z-index:50;
+      width: 320px;
+      border-radius: 22px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(10,14,24,.78);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.55);
+      overflow:hidden;
+      user-select:none;
+    }
+    .hud .hhd{
+      padding:10px 12px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .hud .hbd{padding:10px 12px}
+    .hud .meter{
+      height:10px; border-radius:999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .hud .meter > i{
+      display:block; height:100%;
+      width: var(--w, 40%);
+      background: linear-gradient(90deg, rgba(124,247,197,.95), rgba(134,183,255,.95));
+    }
+    .hud .mini{
+      display:grid; grid-template-columns: 1fr 1fr; gap:10px;
+      margin-top:10px;
+    }
+    .hud .box{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      border-radius: 16px;
+      padding:9px 10px;
+    }
+    .hud .box .v{font-weight:800; font-size:16px}
+    .hud .box .t{font-size:12px; color:var(--muted)}
+    .hud .toggle{
+      display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12px;
+    }
+    .hud .toggle input{width:auto}
+    .hud .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .hud .dragHint{font-size:11px; color:var(--faint)}
+    .hud.min{height:48px}
+    .hud.min .hbd{display:none}
+
+    /* Constellation */
+    .constWrap{
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      overflow:hidden;
+      height: 160px;
+    }
+    canvas{display:block}
+
+    /* Collapsibles */
+    details{
+      border-radius: 16px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.12);
+      overflow:hidden;
+    }
+    details summary{
+      cursor:pointer;
+      padding:12px 14px;
+      list-style:none;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      font-weight:750;
+    }
+    details summary::-webkit-details-marker{display:none}
+    details .inside{padding:12px 14px; border-top:1px solid var(--line); color:var(--muted); line-height:1.45}
+    .badgeDot{width:9px; height:9px; border-radius:99px; background: var(--accent); box-shadow: 0 0 0 3px rgba(124,247,197,.16)}
+    .badgeDot.warn{background: var(--warn); box-shadow: 0 0 0 3px rgba(255,210,125,.18)}
+    .badgeDot.bad{background: var(--bad); box-shadow: 0 0 0 3px rgba(255,125,155,.18)}
+
+    /* Event list */
+    .elist{display:flex; flex-direction:column; gap:10px}
+    .ev{
+      border:1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(0,0,0,.14);
+      padding:10px 12px;
+    }
+    .ev .top{display:flex; align-items:flex-start; justify-content:space-between; gap:12px}
+    .ev .ttl{font-weight:800; line-height:1.2}
+    .ev .meta{font-size:12px; color:var(--muted); margin-top:6px}
+    .ev .srcs{margin-top:8px}
+    .ev .srcs .tag{margin-right:6px}
+    .ev .desc{margin-top:8px; color:var(--muted); line-height:1.35}
+    .ev .links{margin-top:8px; display:flex; gap:10px; flex-wrap:wrap}
+    .ev .links a{font-size:12px}
+    .ev .score{font-family:var(--mono); font-size:12px; color:var(--muted)}
+    .ev .score b{color:var(--txt)}
+
+    /* Splash */
+    .splash{
+      position:fixed; inset:0; z-index:100;
+      background: radial-gradient(1100px 700px at 20% 10%, rgba(134,183,255,.25), transparent 55%),
+                  radial-gradient(900px 600px at 80% 30%, rgba(124,247,197,.18), transparent 55%),
+                  linear-gradient(180deg, #060911, #0A1020);
+      display:flex; align-items:center; justify-content:center;
+      transition: opacity .5s ease, transform .5s ease;
+    }
+    .splash.hide{opacity:0; pointer-events:none; transform: translateY(-8px)}
+    .splash .panel{
+      width:min(720px, 92vw);
+      border-radius: 28px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(10,14,24,.65);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 24px 90px rgba(0,0,0,.6);
+      overflow:hidden;
+    }
+    .splash .panel .in{
+      padding:18px 18px 16px;
+      display:grid; grid-template-columns: 1.2fr .8fr; gap:14px;
+      align-items:stretch;
+    }
+    @media(max-width:820px){
+      .splash .panel .in{grid-template-columns:1fr}
+    }
+    .splash .big{font-size:22px; font-weight:900; letter-spacing:.2px}
+    .splash .sub{margin-top:8px; color:var(--muted); line-height:1.45}
+    .splash .miniCard{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 22px;
+      background: rgba(0,0,0,.18);
+      padding:14px 14px;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .splash .miniCard .line{font-size:12px; color:var(--muted)}
+    .splash .miniCard .line b{color:var(--txt)}
+    .splash .bar{
+      height:10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      overflow:hidden;
+    }
+    .splash .bar i{
+      display:block; height:100%; width: 0%;
+      background: linear-gradient(90deg, rgba(124,247,197,.95), rgba(134,183,255,.95));
+      animation: loadbar 1.25s ease forwards;
+    }
+    @keyframes loadbar{
+      to { width: 100% }
+    }
+
+    /* Footer */
+    footer{
+      margin-top:18px;
+      padding:14px 16px;
+      border-top:1px solid var(--line);
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    /* Print */
+    @media print{
+      .topbar,.hud,.splash{display:none !important}
+      body{background:#fff !important; color:#000 !important}
+      .card, .hero{box-shadow:none !important; border-color:#bbb !important}
+      a{color:#000 !important; text-decoration:underline !important}
+      .tag{border-color:#bbb !important; color:#000 !important}
+    }
+  </style>
+</head>
+<body>
+  <!--
+    Zero-Harm + Anti-Inversion Note:
+    This dashboard avoids coercion, avoids hidden telemetry, avoids auto-sending, and keeps analysis transparent.
+    It is designed to reduce misinformation risk via redundancy and to support peaceful, lawful, user-chosen actions.
+  -->
+
+  <!-- =========================================================
+       TOOLTIP: Splash Screen
+       What it is: Animated entry panel.
+       What it does: Communicates offline-first ethos and initializes local state.
+       How to extend: Add additional preflight checks or a "tour" carousel.
+       Outcome: Smoother onboarding and fewer “what is this?” moments.
+  ========================================================== -->
+  <div id="splash" class="splash" aria-live="polite">
+    <div class="panel">
+      <div class="in">
+        <div>
+          <div class="big">Conflict Redundancy Dashboard 🧭✨</div>
+          <div class="sub">
+            A multi-source monitoring view built to resist single-source narratives. It compares signals across sources,
+            flags divergences, and then turns “awareness” into gentle, nonviolent action paths.
+          </div>
+          <div class="sub tiny">
+            Online-first, offline-capable (IndexedDB + cache). No external libraries. No tracking. Local-only “analytics” (optional).
+          </div>
+          <div class="sub">
+            <div class="bar" aria-label="Loading"><i></i></div>
+          </div>
+          <div class="right" style="margin-top:10px">
+            <button class="btn primary" id="enterBtn">Enter Dashboard</button>
+            <button class="btn" id="resetLocalBtn">Reset Local Data</button>
+          </div>
+        </div>
+        <div class="miniCard">
+          <div class="line"><b>Goal:</b> anti-disinformation via redundancy + transparency.</div>
+          <div class="line"><b>Mode:</b> fetch what can be fetched, cache what is fetched, and let you import the rest.</div>
+          <div class="line"><b>Safety:</b> rate-limited input + sanitization + no auto-outreach.</div>
+          <div class="line"><b>Action:</b> questions that help you choose *your* peace cascade path.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       TOOLTIP: Sticky Nav / TOC + Search
+       What it is: Always-available navigation and client-side search.
+       What it does: Helps find sections and events quickly.
+       How to extend: Add more anchors or expand search to include cached raw docs.
+       Outcome: Faster “what changed?” exploration.
+  ========================================================== -->
+  <header class="topbar">
+    <div class="inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div style="font-weight:900; line-height:1.1">Redundancy Conflict Monitor</div>
+          <div class="tiny muted">Multi-source • Offline-first • Local-only</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Table of contents">
+        <a href="#live">Live</a>
+        <a href="#sources">Sources</a>
+        <a href="#signals">Signals</a>
+        <a href="#action">Action Lab</a>
+        <a href="#import">Import</a>
+        <a href="#settings">Settings</a>
+        <a href="#about">About</a>
+      </nav>
+      <div class="searchBox">
+        <input id="search" type="search" placeholder="Search events, places, keywords…" autocomplete="off" />
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- =========================================================
+         TOOLTIP: Hero Parallax Section
+         What it is: Overview banner with “signal status” indicators.
+         What it does: Quick sense of whether your feed is fresh, divergent, or stale.
+         How to extend: Add a “region focus” map or custom topic presets.
+         Outcome: Immediate situational awareness.
+    ========================================================== -->
+    <section class="hero" id="top">
+      <div class="bg" id="parallaxBg" aria-hidden="true"></div>
+      <div class="fg">
+        <div class="title">
+          <div>
+            <h1>Global Conflict Monitoring (Redundant Signal View) 🌍🛰️</h1>
+            <p>
+              This dashboard merges multiple online sources (where CORS/API access permits), compares them,
+              and surfaces <span class="mono">divergence</span> as a first-class signal (a classic disinformation pressure point).
+              When sources disagree, it doesn’t “pick a side”—it shows the mismatch and asks better questions.
+            </p>
+          </div>
+          <div class="badges">
+            <span class="pill" title="How recently any source successfully updated"><b id="freshnessPill">Freshness:</b> <span id="freshnessVal">—</span></span>
+            <span class="pill" title="How much sources disagree about the same topic"><b>Divergence:</b> <span id="divergenceVal">—</span></span>
+            <span class="pill" title="Offline cache status"><b>Cache:</b> <span id="cacheVal">—</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="row" style="margin-top:14px">
+      <!-- =========================================================
+           TOOLTIP: Live Dashboard
+           What it is: Controls + event feed + quick stats.
+           What it does: Pulls data from configured connectors and merges into a single view.
+           How to extend: Add new connectors in CONNECTORS[] with normalize().
+           Outcome: A living “watchboard” without single-source dependence.
+      ========================================================== -->
+      <section class="col card" id="live">
+        <div class="hd">
+          <h2>Live Dashboard 🧪</h2>
+          <div class="right">
+            <button class="btn primary small" id="refreshBtn" title="Fetch sources now (rate-limited)">Refresh</button>
+            <button class="btn small" id="useCacheBtn" title="Load last cached results from IndexedDB">Use Cache</button>
+            <button class="btn small" id="exportBtn" title="Export merged events as JSON (local download)">Export JSON</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="grid3">
+            <div class="card" style="box-shadow:none">
+              <div class="hd"><h3>Focus</h3></div>
+              <div class="bd">
+                <label for="region">Region preset</label>
+                <select id="region">
+                  <option value="world">World (broad)</option>
+                  <option value="europe">Europe</option>
+                  <option value="mena">Middle East & North Africa</option>
+                  <option value="ssa">Sub-Saharan Africa</option>
+                  <option value="asia">Asia</option>
+                  <option value="americas">Americas</option>
+                </select>
+                <label for="window">Time window</label>
+                <select id="window">
+                  <option value="7">Last 7 days</option>
+                  <option value="14">Last 14 days</option>
+                  <option value="30">Last 30 days</option>
+                </select>
+                <label for="minScore">Minimum confidence</label>
+                <select id="minScore">
+                  <option value="0">Show all</option>
+                  <option value="0.35">≥ 0.35</option>
+                  <option value="0.55" selected>≥ 0.55</option>
+                  <option value="0.70">≥ 0.70</option>
+                </select>
+                <div class="sep"></div>
+                <div class="tiny muted">
+                  Confidence here is *not “truth.”* It’s a redundancy-based quality hint (coverage, corroboration, metadata, and divergence penalties).
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="box-shadow:none">
+              <div class="hd"><h3>Signal Summary</h3></div>
+              <div class="bd">
+                <div class="tag good"><span aria-hidden="true">✅</span> Sources ok: <b id="srcOk">0</b></div>
+                <div class="tag warn"><span aria-hidden="true">⚠️</span> Partial: <b id="srcPartial">0</b></div>
+                <div class="tag bad"><span aria-hidden="true">⛔</span> Failed: <b id="srcFail">0</b></div>
+                <div class="sep"></div>
+                <div class="tiny muted">Failures are usually CORS restrictions or missing API keys. Add keys in <a href="#sources">Sources</a> or import data in <a href="#import">Import</a>.</div>
+                <div class="sep"></div>
+                <div class="tiny">
+                  <span class="k">Merged events:</span> <b id="mergedCount">0</b><br/>
+                  <span class="k">Unique clusters:</span> <b id="clusterCount">0</b><br/>
+                  <span class="k">High divergence clusters:</span> <b id="highDivCount">0</b>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="box-shadow:none">
+              <div class="hd"><h3>Quick Filters</h3></div>
+              <div class="bd">
+                <label for="topic">Topic</label>
+                <select id="topic">
+                  <option value="all">All</option>
+                  <option value="war">War / Armed conflict</option>
+                  <option value="humanitarian">Humanitarian impact</option>
+                  <option value="diplomacy">Diplomacy / Talks</option>
+                  <option value="civilians">Civilian harm</option>
+                  <option value="displacement">Displacement</option>
+                </select>
+
+                <label for="sort">Sort</label>
+                <select id="sort">
+                  <option value="score">Confidence (desc)</option>
+                  <option value="time">Recency (desc)</option>
+                  <option value="div">Divergence (desc)</option>
+                </select>
+
+                <label for="maxItems">Max items</label>
+                <select id="maxItems">
+                  <option value="25">25</option>
+                  <option value="50" selected>50</option>
+                  <option value="100">100</option>
+                </select>
+
+                <div class="sep"></div>
+                <div class="tiny muted">
+                  Tip: Search is global and runs client-side. Combine it with filters for “surgical” scanning.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="elist" id="eventList" aria-live="polite"></div>
+
+          <div class="sep"></div>
+          <details>
+            <summary>
+              <span>How the merge works (anti-disinfo logic) 🧠</span>
+              <span class="badgeDot" aria-hidden="true"></span>
+            </summary>
+            <div class="inside">
+              <ul>
+                <li><b>Normalize</b> each source into a common schema (title, time, location, tags, link, excerpt).</li>
+                <li><b>Cluster</b> similar items by (time window + token similarity + location hints).</li>
+                <li><b>Score</b> each cluster by corroboration depth and metadata quality, then <b>penalize</b> extreme divergence.</li>
+                <li><b>Expose</b> disagreements explicitly. Divergence is not “noise”—it’s an alert that pressure is being applied to the story space.</li>
+              </ul>
+              <div class="tiny muted">
+                Nothing here declares “the truth.” It helps you detect when truth is being fought over.
+              </div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           TOOLTIP: Signals Panel + Constellation
+           What it is: Divergence readouts and a small “state constellation.”
+           What it does: Visualizes system state changes over time.
+           How to extend: Add more nodes for new signals (e.g., “aid delivered”, “ceasefire violations”).
+           Outcome: A quick “health of the feed” glance.
+      ========================================================== -->
+      <aside class="col card" id="signals">
+        <div class="hd">
+          <h2>Signals & Divergence 🌌</h2>
+          <div class="right">
+            <button class="btn small" id="pinHudBtn" title="Toggle HUD minimization">Toggle HUD</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="constWrap" title="Constellation visualizes your local state: freshness, divergence, source health, actions taken">
+            <canvas id="constellation" width="740" height="320"></canvas>
+          </div>
+          <div class="sep"></div>
+          <div class="grid2">
+            <div class="card" style="box-shadow:none">
+              <div class="hd"><h3>Highest Divergence</h3></div>
+              <div class="bd">
+                <div id="divList" class="tiny muted">—</div>
+              </div>
+            </div>
+            <div class="card" style="box-shadow:none">
+              <div class="hd"><h3>What Divergence Suggests</h3></div>
+              <div class="bd tiny muted" style="line-height:1.45">
+                Divergence can mean:
+                <div class="sep"></div>
+                <div class="tag warn">Coverage gaps</div>
+                <div class="tag warn">Different definitions</div>
+                <div class="tag warn">Censorship pressure</div>
+                <div class="tag warn">Narrative ops</div>
+                <div class="tag warn">Lag (timing)</div>
+                <div class="tag warn">Regional blind spots</div>
+                <div class="sep"></div>
+                Your move is not panic. Your move is <b>better questions</b> and <b>nonviolent actions</b>.
+              </div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+          <details>
+            <summary>
+              <span>“Better questions” engine (for peace actionability) 🧰</span>
+              <span class="badgeDot warn" aria-hidden="true"></span>
+            </summary>
+            <div class="inside">
+              This dashboard generates questions per cluster. These are designed to:
+              <ul>
+                <li>reduce “us vs them” thinking</li>
+                <li>identify concrete needs (aid, evacuation, mediation, fact-check)</li>
+                <li>move you from “doom scroll” → “small peaceful leverage”</li>
+              </ul>
+              See <a href="#action">Action Lab</a> for the full flow.
+            </div>
+          </details>
+        </div>
+      </aside>
+    </div>
+
+    <!-- =========================================================
+         TOOLTIP: Source Configuration
+         What it is: A registry of connectors (some public, some key-based).
+         What it does: Lets users add keys/endpoints and stores them locally.
+         How to extend: Add new connectors in JS with normalize() and fetch().
+         Outcome: Multi-source redundancy without external dependencies.
+    ========================================================== -->
+    <section class="card" id="sources" style="margin-top:14px">
+      <div class="hd">
+        <h2>Sources & Redundancy 🧷</h2>
+        <div class="right">
+          <button class="btn small" id="addCustomSourceBtn" title="Add a custom JSON endpoint that supports CORS">Add Custom Source</button>
+          <button class="btn danger small" id="clearKeysBtn" title="Clears locally stored API keys">Clear Keys</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="tiny muted" style="line-height:1.45">
+          Some high-quality conflict datasets require API keys or block browser CORS.
+          This file stays <b>standalone</b>, so it can’t ship a server proxy. Instead:
+          <ul>
+            <li>It includes <b>public/no-key connectors</b> that often work directly from browsers.</li>
+            <li>It supports <b>keyed connectors</b> (you provide keys; they’re stored locally).</li>
+            <li>It supports <b>manual import</b> for anything that blocks browser access.</li>
+          </ul>
+          That “three-path” design is the redundancy trick. 🧠✨
+        </div>
+
+        <div class="sep"></div>
+
+        <div id="sourceCards" class="grid2"></div>
+
+        <div class="sep"></div>
+
+        <details>
+          <summary>
+            <span>Why some sources fail in-browser (CORS) 🧱</span>
+            <span class="badgeDot bad" aria-hidden="true"></span>
+          </summary>
+          <div class="inside">
+            Many organizations block direct browser access to APIs unless you use their SDK, a backend proxy, or specific headers.
+            Because this dashboard is a single file (no backend), you’ll see failures for some endpoints.
+            That’s normal. Use import for those datasets or run a personal proxy on your own machine (optional, not included here).
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TOOLTIP: Action Lab
+         What it is: A guided, nonviolent action workflow.
+         What it does: Converts cluster signals into “choose-your-path” actions.
+         How to extend: Add new action templates or local mission tracking.
+         Outcome: Users cascade peace on their own terms—without coercion.
+    ========================================================== -->
+    <section class="card" id="action" style="margin-top:14px">
+      <div class="hd">
+        <h2>Action Lab — Cascade Peace on Your Terms 🕊️</h2>
+        <div class="right">
+          <button class="btn small" id="newActionSprintBtn" title="Start a 7-day micro-sprint (local-only)">Start 7-Day Sprint</button>
+          <button class="btn small" id="logActionBtn" title="Log a completed action (local-only)">Log Action</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="grid2">
+          <div>
+            <div class="tiny muted" style="line-height:1.45">
+              This is where “monitoring” becomes “meaning.” The workflow is:
+              <ol>
+                <li><b>Choose a cluster</b> (an event/story area).</li>
+                <li><b>Answer 5 questions</b> that reduce misinformation + increase helpfulness.</li>
+                <li><b>Pick an action lane</b> (aid, narrative hygiene, civic pressure, conflict empathy, personal circle).</li>
+                <li><b>Log</b> what you did (private, local-only) to build continuity.</li>
+              </ol>
+              Nothing auto-sends. Nothing pressures violence. Everything is user-chosen.
+            </div>
+            <div class="sep"></div>
+            <label for="clusterPick">Pick a cluster</label>
+            <select id="clusterPick"></select>
+
+            <label for="actionLane">Action lane</label>
+            <select id="actionLane">
+              <option value="aid">Aid & relief (donations, mutual aid, vetted orgs)</option>
+              <option value="narrative" selected>Narrative hygiene (share responsibly, cite, avoid bait)</option>
+              <option value="civic">Civic pressure (lawful, nonviolent, representative contact)</option>
+              <option value="empathy">Conflict empathy (humanizing language, bridge-building)</option>
+              <option value="local">Local circle (support refugees, community safety, care)</option>
+            </select>
+
+            <button class="btn primary" id="generatePlanBtn" style="margin-top:10px">Generate Peace Plan</button>
+
+            <div class="sep"></div>
+            <div class="tiny muted">
+              Optional: Turn on local-only “analytics” in Settings to see your own progress trends (still private).
+            </div>
+          </div>
+
+          <div>
+            <details open>
+              <summary>
+                <span>Actionability questions (5) 🧩</span>
+                <span class="badgeDot" aria-hidden="true"></span>
+              </summary>
+              <div class="inside" id="questionsBox">
+                <ol>
+                  <li>What is the <b>minimum claim</b> we can verify across at least two sources?</li>
+                  <li>What would change my mind? (What evidence would <b>falsify</b> my current belief?)</li>
+                  <li>Who is harmed the most right now, and what is the <b>lowest-risk</b> help available?</li>
+                  <li>What framing reduces dehumanization and increases solutions?</li>
+                  <li>What is one nonviolent action I can complete in <b>15 minutes</b>?</li>
+                </ol>
+              </div>
+            </details>
+
+            <div class="sep"></div>
+
+            <details>
+              <summary>
+                <span>Generated plan 🗺️</span>
+                <span class="badgeDot warn" aria-hidden="true"></span>
+              </summary>
+              <div class="inside" id="planBox">
+                Choose a cluster and click “Generate Peace Plan.”
+              </div>
+            </details>
+
+            <div class="sep"></div>
+
+            <details>
+              <summary>
+                <span>Your local action log 📓</span>
+                <span class="badgeDot" aria-hidden="true"></span>
+              </summary>
+              <div class="inside">
+                <div id="actionLog" class="tiny muted">No actions logged yet.</div>
+                <div class="sep"></div>
+                <button class="btn danger small" id="clearActionLogBtn">Clear Action Log</button>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TOOLTIP: Import + Manual Redundancy
+         What it is: Paste JSON/CSV or drop files for datasets blocked by CORS.
+         What it does: Adds imported items into the same merge pipeline.
+         How to extend: Add CSV parsers for specific providers or schemas.
+         Outcome: Your redundancy remains intact even when APIs won’t cooperate.
+    ========================================================== -->
+    <section class="card" id="import" style="margin-top:14px">
+      <div class="hd">
+        <h2>Import Data (When APIs Block Browsers) 📦</h2>
+        <div class="right">
+          <button class="btn small" id="importParseBtn" title="Parse pasted data into events">Parse & Merge</button>
+          <button class="btn small" id="importClearBtn" title="Clear imported dataset from local storage">Clear Imported</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="grid2">
+          <div>
+            <label for="importName">Import label</label>
+            <input id="importName" placeholder="e.g., ACLED export, UCDP CSV, NGO report notes" />
+
+            <label for="importText">Paste JSON (array of objects) or CSV</label>
+            <textarea id="importText" placeholder="Paste here. Nothing is uploaded. Nothing is sent."></textarea>
+
+            <div class="tiny muted" style="margin-top:10px; line-height:1.45">
+              Supported (best-effort):
+              <ul>
+                <li><b>JSON</b> array with fields like: title/name, date/time, country/region, summary/description, url/link.</li>
+                <li><b>CSV</b> with headers such as: title,date,location,summary,url,tags</li>
+              </ul>
+              Imports become another “source” for redundancy scoring.
+            </div>
+          </div>
+
+          <div>
+            <details open>
+              <summary>
+                <span>Schema hints (safe + simple) 🧱</span>
+                <span class="badgeDot" aria-hidden="true"></span>
+              </summary>
+              <div class="inside tiny muted" style="line-height:1.45">
+                To get the most useful merge:
+                <ul>
+                  <li>Include <b>date</b> in ISO format if possible (YYYY-MM-DD).</li>
+                  <li>Include at least one <b>location hint</b> (country, city, or region).</li>
+                  <li>Include a <b>url</b> if the item references a public report.</li>
+                  <li>If your dataset has “fatalities” or “displaced,” include it in summary (numbers help clustering).</li>
+                </ul>
+                <div class="sep"></div>
+                Example JSON item:
+                <pre class="mono" style="white-space:pre-wrap; margin:0; color:var(--txt)">
+{
+  "title": "Clashes reported near X",
+  "date": "2026-01-01",
+  "location": "Country / City",
+  "summary": "Short neutral description. Numbers if available.",
+  "url": "https://example.org/report",
+  "tags": ["war","civilians"]
+}</pre>
+              </div>
+            </details>
+
+            <div class="sep"></div>
+            <details>
+              <summary>
+                <span>Drop file (offline-friendly) 🗂️</span>
+                <span class="badgeDot warn" aria-hidden="true"></span>
+              </summary>
+              <div class="inside">
+                <input id="filePick" type="file" accept=".json,.csv,.txt" />
+                <div class="tiny muted" style="margin-top:8px">Files are read locally in your browser. Not uploaded.</div>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TOOLTIP: Settings
+         What it is: Offline behavior, local-only analytics, privacy controls.
+         What it does: Stores preferences in IndexedDB; manages service worker.
+         How to extend: Add more toggles and store them under settingsStore.
+         Outcome: Transparent, user-controlled persistence.
+    ========================================================== -->
+    <section class="card" id="settings" style="margin-top:14px">
+      <div class="hd">
+        <h2>Settings ⚙️</h2>
+        <div class="right">
+          <button class="btn small" id="swStatusBtn" title="Show service worker status">SW Status</button>
+          <button class="btn danger small" id="wipeAllBtn" title="Wipe all local data (IndexedDB + cache)">Wipe All Local</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="grid3">
+          <div class="card" style="box-shadow:none">
+            <div class="hd"><h3>Offline</h3></div>
+            <div class="bd">
+              <div class="toggle">
+                <input id="offlineCacheToggle" type="checkbox" />
+                <label for="offlineCacheToggle" style="margin:0">Cache fetched results for offline use</label>
+              </div>
+              <div class="toggle" style="margin-top:10px">
+                <input id="autoRefreshToggle" type="checkbox" />
+                <label for="autoRefreshToggle" style="margin:0">Auto-refresh on open (gentle)</label>
+              </div>
+              <div class="toggle" style="margin-top:10px">
+                <input id="preferCacheToggle" type="checkbox" />
+                <label for="preferCacheToggle" style="margin:0">Prefer cache when online is flaky</label>
+              </div>
+              <div class="sep"></div>
+              <div class="tiny muted">Note: browser caching is best-effort. Some environments purge storage under pressure.</div>
+            </div>
+          </div>
+
+          <div class="card" style="box-shadow:none">
+            <div class="hd"><h3>Local-Only Analytics (Optional)</h3></div>
+            <div class="bd">
+              <div class="toggle">
+                <input id="localAnalyticsToggle" type="checkbox" />
+                <label for="localAnalyticsToggle" style="margin:0">Track my own usage locally</label>
+              </div>
+              <div class="sep"></div>
+              <div class="tiny muted" style="line-height:1.45">
+                This logs only counts (refreshes, searches, actions) in IndexedDB.
+                It never sends data anywhere. You can reset it anytime.
+              </div>
+              <div class="sep"></div>
+              <button class="btn small" id="resetAnalyticsBtn">Reset Local Analytics</button>
+            </div>
+          </div>
+
+          <div class="card" style="box-shadow:none">
+            <div class="hd"><h3>Safety</h3></div>
+            <div class="bd tiny muted" style="line-height:1.45">
+              <ul>
+                <li>No auto-outreach. No auto-posting.</li>
+                <li>Input sanitized (no HTML injection).</li>
+                <li>Rate-limited fetch to reduce abuse or accidental hammering.</li>
+                <li>“Peace plans” avoid violence and coercion by design.</li>
+              </ul>
+              <div class="sep"></div>
+              <div class="tag good">Zero-harm default</div>
+              <div class="tag warn">User-controlled</div>
+              <div class="tag bad">No hidden telemetry</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TOOLTIP: About / Attributions
+         What it is: Explanation, limitations, and licensing notes.
+         What it does: Keeps expectations realistic and transparent.
+         How to extend: Add your own org links and policy notes.
+         Outcome: Trust through clarity.
+    ========================================================== -->
+    <section class="card" id="about" style="margin-top:14px">
+      <div class="hd">
+        <h2>About, Limits, Attributions 📜</h2>
+        <div class="right">
+          <span class="pill"><b>Mode:</b> Standalone index.html</span>
+          <span class="pill"><b>Storage:</b> IndexedDB</span>
+          <span class="pill"><b>Network:</b> Fetch + cache + import</span>
+        </div>
+      </div>
+      <div class="bd">
+        <details open>
+          <summary>
+            <span>What this is (and isn’t) 🧭</span>
+            <span class="badgeDot" aria-hidden="true"></span>
+          </summary>
+          <div class="inside">
+            <p>
+              This is a <b>signal comparison tool</b>, not a judge of reality. It reduces the chance that a single feed,
+              a single outlet, or a single viral thread becomes your entire world-model.
+            </p>
+            <p>
+              When sources disagree, the dashboard highlights the mismatch and gives you questions and peaceful actions.
+              That’s the anti-disinformation move: make manipulation expensive by refusing to accept single-channel certainty.
+            </p>
+          </div>
+        </details>
+
+        <div class="sep"></div>
+
+        <details>
+          <summary>
+            <span>Attributions & licensing ✅</span>
+            <span class="badgeDot warn" aria-hidden="true"></span>
+          </summary>
+          <div class="inside">
+            <ul>
+              <li><b>Design patterns:</b> Inspired by common open UX patterns (cards, sticky nav, local-first caching). No proprietary code copied.</li>
+              <li><b>APIs:</b> This file can query public endpoints (when permitted) and supports user-provided keys for key-based datasets.</li>
+              <li><b>Your data:</b> Your keys and imports live only in your browser (IndexedDB). Export and wipe are available anytime.</li>
+            </ul>
+          </div>
+        </details>
+
+        <div class="sep"></div>
+
+        <div class="tiny muted">
+          Tip for “maximum redundancy”: use <b>at least three independent sources</b> (e.g., a news signal like GDELT, a humanitarian signal like ReliefWeb,
+          and a dataset export you import manually). Then watch divergence and ask: “what’s missing, who benefits, and how do I help without harm?”
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <b>Zero-Harm & Anti-Inversion:</b> This dashboard is designed for nonviolent, user-chosen peacebuilding.
+      It avoids coercion, avoids hidden telemetry, and keeps all data local unless you explicitly fetch public sources. 🕊️
+      <div class="faint">No secrets stored. No auto-send features. Clear reset controls included.</div>
+    </footer>
+  </main>
+
+  <!-- =========================================================
+       TOOLTIP: HUD (Gamification)
+       What it is: Lightweight “progress + integrity” overlay.
+       What it does: Tracks your personal “peace praxis” locally.
+       How to extend: Add more stats (e.g., verified citations shared, mutual aid actions).
+       Outcome: Keeps the user engaged without becoming performative or coercive.
+  ========================================================== -->
+  <div class="hud" id="hud" role="region" aria-label="Peace HUD">
+    <div class="hhd">
+      <div style="display:flex; align-items:center; gap:10px">
+        <div class="badgeDot" aria-hidden="true"></div>
+        <div>
+          <div style="font-weight:900">Peace HUD</div>
+          <div class="dragHint">Local-only • drag to move (optional)</div>
+        </div>
+      </div>
+      <button class="btn small" id="minHudBtn" title="Minimize HUD">—</button>
+    </div>
+    <div class="hbd">
+      <div class="tiny muted">Momentum</div>
+      <div class="meter" aria-label="Momentum meter"><i id="momentumBar" style="--w: 35%"></i></div>
+
+      <div class="mini">
+        <div class="box">
+          <div class="v" id="hudActions">0</div>
+          <div class="t">Actions logged</div>
+        </div>
+        <div class="box">
+          <div class="v" id="hudChecks">0</div>
+          <div class="t">Refreshes</div>
+        </div>
+        <div class="box">
+          <div class="v" id="hudDiverg">—</div>
+          <div class="t">Divergence</div>
+        </div>
+        <div class="box">
+          <div class="v" id="hudStreak">0</div>
+          <div class="t">Day streak</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary small" id="hudQuickAction">Log 15-min Action</button>
+        <button class="btn small" id="hudSnapshot">Snapshot</button>
+        <button class="btn danger small" id="hudReset">Reset HUD</button>
+      </div>
+    </div>
+  </div>
+
+  <noscript>
+    <div style="max-width:900px;margin:18px auto;padding:12px 14px;border:1px solid #888;border-radius:14px;background:#fff;color:#000">
+      <b>Noscript mode:</b> This dashboard needs JavaScript for fetching and offline storage.
+      You can still use it as a static document: read the sections and use the import schema notes.
+    </div>
+  </noscript>
+
+  <script>
+    /* =========================================================
+       TOOLTIP: Safety Utilities
+       What it is: Sanitization + rate limiting.
+       What it does: Prevents injection and avoids hammering endpoints.
+       How to extend: Add stronger validation for URLs or field schemas.
+       Outcome: Safer standalone file.
+    ========================================================== */
+    const Safe = (() => {
+      const escape = (s) => String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#39;");
+
+      const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+      const now = () => Date.now();
+
+      // Gentle rate limiter: allows bursts, then slows.
+      const limiter = (() => {
+        const state = { last: 0, tokens: 4, refillMs: 4000, max: 4 };
+        return {
+          allow() {
+            const t = now();
+            const delta = t - state.last;
+            if (delta > state.refillMs) {
+              const refill = Math.floor(delta / state.refillMs);
+              state.tokens = Math.min(state.max, state.tokens + refill);
+              state.last = t;
+            }
+            if (state.tokens <= 0) return false;
+            state.tokens -= 1;
+            return true;
+          }
+        }
+      })();
+
+      const hashTokens = (text) => {
+        // Small deterministic hash for clustering hints (not crypto).
+        let h = 2166136261;
+        for (let i=0;i<text.length;i++){
+          h ^= text.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return (h>>>0).toString(16);
+      };
+
+      return { escape, clamp, limiter, hashTokens };
+    })();
+
+    /* =========================================================
+       TOOLTIP: IndexedDB Wrapper
+       What it is: Minimal, dependency-free IDB helper.
+       What it does: Stores settings, cached events, imports, action logs.
+       How to extend: Add new stores in onupgradeneeded.
+       Outcome: Offline persistence without external libs.
+    ========================================================== */
+    const DB = (() => {
+      const DB_NAME = "conflict_redundancy_db";
+      const DB_VER = 1;
+      let db = null;
+
+      function open(){
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(DB_NAME, DB_VER);
+          req.onupgradeneeded = () => {
+            const d = req.result;
+            const mk = (name, keyPath="id") => {
+              if(!d.objectStoreNames.contains(name)) d.createObjectStore(name, { keyPath });
+            };
+            mk("settings");
+            mk("cache");
+            mk("imports");
+            mk("actions");
+            mk("analytics");
+            mk("sources"); // user custom sources + keys
+          };
+          req.onsuccess = () => { db = req.result; resolve(db); };
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      function tx(store, mode="readonly"){
+        if(!db) throw new Error("DB not open");
+        return db.transaction(store, mode).objectStore(store);
+      }
+
+      function put(store, val){
+        return new Promise((resolve,reject)=>{
+          const r = tx(store, "readwrite").put(val);
+          r.onsuccess=()=>resolve(true);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+      function get(store, id){
+        return new Promise((resolve,reject)=>{
+          const r = tx(store).get(id);
+          r.onsuccess=()=>resolve(r.result ?? null);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+      function del(store, id){
+        return new Promise((resolve,reject)=>{
+          const r = tx(store, "readwrite").delete(id);
+          r.onsuccess=()=>resolve(true);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+      function all(store){
+        return new Promise((resolve,reject)=>{
+          const r = tx(store).getAll();
+          r.onsuccess=()=>resolve(r.result ?? []);
+          r.onerror=()=>reject(r.error);
+        });
+      }
+      async function wipeAll(){
+        if(db) db.close();
+        await new Promise((resolve,reject)=>{
+          const r = indexedDB.deleteDatabase(DB_NAME);
+          r.onsuccess=()=>resolve(true);
+          r.onerror=()=>reject(r.error);
+          r.onblocked=()=>resolve(true);
+        });
+        db = null;
+      }
+
+      return { open, put, get, del, all, wipeAll, DB_NAME };
+    })();
+
+    /* =========================================================
+       TOOLTIP: Service Worker (offline caching)
+       What it is: A tiny SW generated from a Blob.
+       What it does: Caches this single page and allows offline open.
+       How to extend: Add runtime caching for user-approved endpoints.
+       Outcome: Offline fallback without additional files.
+    ========================================================== */
+    async function registerSW(){
+      const code = `
+        const CACHE = "conflict-redundancy-v1";
+        self.addEventListener("install", (e) => {
+          e.waitUntil((async () => {
+            const cache = await caches.open(CACHE);
+            try { await cache.addAll([self.registration.scope]); } catch (e) {}
+            self.skipWaiting();
+          })());
+        });
+        self.addEventListener("activate", (e) => {
+          e.waitUntil((async () => {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => (k===CACHE)?null:caches.delete(k)));
+            self.clients.claim();
+          })());
+        });
+        self.addEventListener("fetch", (e) => {
+          const req = e.request;
+          // Cache-first for same-origin navigations (this file).
+          if (req.mode === "navigate") {
+            e.respondWith((async () => {
+              const cache = await caches.open(CACHE);
+              const cached = await cache.match(self.registration.scope);
+              try {
+                const fresh = await fetch(req);
+                cache.put(self.registration.scope, fresh.clone());
+                return fresh;
+              } catch (err) {
+                return cached || new Response("Offline and no cache yet.", {status: 503});
+              }
+            })());
+            return;
+          }
+          // Default: pass-through (we don't cache third-party APIs by default).
+        });
+      `;
+      try{
+        const blob = new Blob([code], {type:"text/javascript"});
+        const url = URL.createObjectURL(blob);
+        const reg = await navigator.serviceWorker.register(url, {scope: "./"});
+        return reg;
+      }catch(e){
+        return null;
+      }
+    }
+
+    /* =========================================================
+       TOOLTIP: Connectors
+       What it is: Pluggable data source definitions.
+       What it does: Fetches and normalizes items into a common schema.
+       How to extend: Add a new connector object with fetch() and normalize().
+       Outcome: Multi-source redundancy.
+    ========================================================== */
+    const CONNECTORS = [
+      {
+        id: "gdelt",
+        name: "GDELT 2.1 (News signal)",
+        kind: "public",
+        hint: "Often CORS-friendly. Good for broad media signal. Not a ground-truth dataset.",
+        enabledByDefault: true,
+        fields: [
+          { key:"mode", label:"Mode", type:"select", options:[
+            ["doc","DOC (Articles)"], ["events","EVENTS (coarse signal)"]
+          ], def:"doc" }
+        ],
+        async fetch({windowDays, query, region, fields}){
+          const mode = fields.mode ?? "doc";
+          const now = new Date();
+          const past = new Date(Date.now() - windowDays*24*3600*1000);
+          const fmt = (d)=> d.toISOString().slice(0,10).replaceAll("-","");
+          const start = fmt(past), end = fmt(now);
+
+          const regionQ = ({
+            world:"",
+            europe:"sourceCountry:EU OR theme:EUROPE",
+            mena:"theme:MIDDLEEAST OR theme:NORTHAFRICA",
+            ssa:"theme:AFRICA",
+            asia:"theme:ASIA",
+            americas:"theme:LATIN_AMERICA OR theme:NORTHAMERICA"
+          })[region] || "";
+
+          const q = [query?.trim() ? `(${query.trim()})` : "(conflict OR ceasefire OR truce OR clashes OR shelling OR airstrike OR hostage OR humanitarian)",
+                     regionQ].filter(Boolean).join(" AND ");
+
+          if(mode === "events"){
+            const url = "https://api.gdeltproject.org/api/v2/events/search?format=json"
+              + "&query=" + encodeURIComponent(q)
+              + "&startdatetime=" + start + "000000"
+              + "&enddatetime=" + end + "235959"
+              + "&mode=timelinevolraw";
+            const r = await fetch(url, {mode:"cors"});
+            if(!r.ok) throw new Error("GDELT events fetch failed");
+            const j = await r.json();
+            // timelinevolraw returns time buckets; convert to pseudo-items
+            const items = (j?.timeline?.[0]?.data || []).slice(-20).map(d => ({
+              title: "GDELT: Conflict-related media volume",
+              date: d?.date || "",
+              location: region,
+              summary: `Volume: ${d?.value ?? "?"} (bucket ${d?.date})`,
+              url
+            }));
+            return items;
+          } else {
+            const url = "https://api.gdeltproject.org/api/v2/doc/doc?format=json&mode=ArtList"
+              + "&query=" + encodeURIComponent(q)
+              + "&startdatetime=" + start + "000000"
+              + "&enddatetime=" + end + "235959"
+              + "&maxrecords=100&format=json&sort=HybridRel";
+            const r = await fetch(url, {mode:"cors"});
+            if(!r.ok) throw new Error("GDELT doc fetch failed");
+            const j = await r.json();
+            const arts = (j?.articles || []).slice(0, 100);
+            return arts.map(a => ({
+              title: a.title || "Untitled",
+              date: a.seendate || a.datetime || "",
+              location: (a.sourceCountry || "") + (a.location ? " • " + a.location : ""),
+              summary: a.snippet || a.description || "",
+              url: a.url || "",
+              tags: ["news"]
+            }));
+          }
+        },
+        normalize(item){
+          return {
+            title: String(item.title || "").slice(0, 220),
+            time: parseTime(item.date),
+            location: String(item.location || ""),
+            summary: String(item.summary || "").slice(0, 900),
+            url: safeUrl(item.url),
+            tags: Array.isArray(item.tags)? item.tags : [],
+            source: "GDELT",
+          };
+        }
+      },
+
+      {
+        id: "reliefweb",
+        name: "ReliefWeb (Humanitarian signal)",
+        kind: "public",
+        hint: "Humanitarian updates, situations, reports. Great for needs-based lens.",
+        enabledByDefault: true,
+        fields: [
+          { key:"type", label:"Content type", type:"select", options:[
+            ["reports","Reports"], ["jobs","Jobs (signal of scale)"], ["training","Training"]
+          ], def:"reports" }
+        ],
+        async fetch({windowDays, query, region, fields}){
+          const type = fields.type || "reports";
+          // ReliefWeb API supports JSON queries; use simple "query" string.
+          const q = (query?.trim() ? query.trim() : "conflict OR displacement OR humanitarian OR ceasefire OR violence");
+          const regionMap = {
+            world: null,
+            europe: "europe",
+            mena: "middle-east-and-north-africa",
+            ssa: "sub-saharan-africa",
+            asia: "asia-and-the-pacific",
+            americas: "americas"
+          };
+          const regionSlug = regionMap[region];
+
+          const filter = [];
+          // Date range: last N days
+          const from = new Date(Date.now() - windowDays*24*3600*1000).toISOString();
+          filter.push({ field: "date.created", value: { from } });
+          if(regionSlug) filter.push({ field:"primary_country.region", value:[regionSlug] });
+
+          const body = {
+            query: { value: q },
+            filter: filter.length ? { operator:"AND", conditions: filter } : undefined,
+            sort: ["date.created:desc"],
+            limit: 60,
+            fields: ["title","body","source","primary_country","date","url","format","theme"]
+          };
+
+          const url = `https://api.reliefweb.int/v1/${type}`;
+          const r = await fetch(url, {
+            method:"POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(body)
+          });
+          if(!r.ok) throw new Error("ReliefWeb fetch failed");
+          const j = await r.json();
+          const data = (j?.data || []).slice(0, 60);
+          return data.map(d => ({
+            title: d?.fields?.title || "Untitled",
+            date: d?.fields?.date?.created || "",
+            location: (d?.fields?.primary_country?.map(c=>c.name).join(", ") || ""),
+            summary: stripHtml(d?.fields?.body || "").slice(0, 600),
+            url: d?.fields?.url || d?.href || "",
+            tags: ["humanitarian"]
+          }));
+        },
+        normalize(item){
+          return {
+            title: String(item.title || "").slice(0, 220),
+            time: parseTime(item.date),
+            location: String(item.location || ""),
+            summary: String(item.summary || "").slice(0, 900),
+            url: safeUrl(item.url),
+            tags: Array.isArray(item.tags)? item.tags : ["humanitarian"],
+            source: "ReliefWeb",
+          };
+        }
+      },
+
+      {
+        id: "unimport",
+        name: "Imported Dataset (Your paste/drop)",
+        kind: "import",
+        hint: "Anything blocked by CORS: ACLED exports, UCDP, NGO briefs, etc.",
+        enabledByDefault: true,
+        fields: [],
+        async fetch(){ return []; },
+        normalize(item){
+          return {
+            title: String(item.title || item.name || "Untitled").slice(0,220),
+            time: parseTime(item.date || item.time || item.datetime),
+            location: String(item.location || item.country || item.region || ""),
+            summary: String(item.summary || item.description || item.notes || "").slice(0,900),
+            url: safeUrl(item.url || item.link || ""),
+            tags: Array.isArray(item.tags)? item.tags : guessTagsFromText(String(item.summary||"") + " " + String(item.title||"")),
+            source: String(item.source || "Import"),
+          };
+        }
+      }
+    ];
+
+    /* =========================================================
+       TOOLTIP: Custom user sources
+       What it is: User-defined JSON endpoints or keyed datasets.
+       What it does: Adds to connector list dynamically.
+       How to extend: Add per-source mapping UI.
+       Outcome: More redundancy.
+    ========================================================== */
+    function makeCustomConnector({id, name, url, jsonPath, enabled=true}){
+      return {
+        id,
+        name,
+        kind: "custom",
+        hint: "Custom JSON endpoint. Must support CORS. Optionally specify a path to an array.",
+        enabledByDefault: enabled,
+        fields: [
+          {key:"url", label:"Endpoint URL", type:"text", def:url || ""},
+          {key:"jsonPath", label:"JSON path to array (optional)", type:"text", def: jsonPath || "" }
+        ],
+        async fetch({fields}){
+          const u = fields.url || url;
+          if(!u) throw new Error("No URL set");
+          const r = await fetch(u, {mode:"cors"});
+          if(!r.ok) throw new Error("Custom fetch failed");
+          const j = await r.json();
+          const path = (fields.jsonPath || jsonPath || "").trim();
+          const arr = path ? getPath(j, path) : j;
+          if(!Array.isArray(arr)) throw new Error("JSON path did not resolve to an array");
+          return arr.slice(0, 120);
+        },
+        normalize(item){
+          return {
+            title: String(item.title || item.name || "Untitled").slice(0,220),
+            time: parseTime(item.date || item.time || item.published || item.created),
+            location: String(item.location || item.country || item.region || ""),
+            summary: String(item.summary || item.description || item.body || "").slice(0,900),
+            url: safeUrl(item.url || item.link || ""),
+            tags: Array.isArray(item.tags)? item.tags : guessTagsFromText(String(item.summary||"") + " " + String(item.title||"")),
+            source: name || "Custom",
+          };
+        }
+      };
+    }
+
+    /* =========================================================
+       TOOLTIP: Normalization Helpers
+       Outcome: Makes everything comparable.
+    ========================================================== */
+    function parseTime(x){
+      if(!x) return null;
+      const s = String(x).trim();
+      // Try ISO
+      const d = new Date(s);
+      if(!isNaN(d.getTime())) return d.getTime();
+      // Try YYYYMMDD
+      if(/^\d{8}$/.test(s)){
+        const y = +s.slice(0,4), m = +s.slice(4,6)-1, day=+s.slice(6,8);
+        const dd = new Date(Date.UTC(y,m,day));
+        return dd.getTime();
+      }
+      return null;
+    }
+    function stripHtml(html){
+      const div = document.createElement("div");
+      div.innerHTML = String(html||"");
+      return (div.textContent || div.innerText || "").trim();
+    }
+    function safeUrl(u){
+      const s = String(u||"").trim();
+      if(!s) return "";
+      try{
+        const url = new URL(s, location.href);
+        if(url.protocol === "http:" || url.protocol === "https:") return url.href;
+        return "";
+      }catch(_){ return ""; }
+    }
+    function getPath(obj, path){
+      // path like: data.items or data[0].events
+      const parts = path.replaceAll("[", ".[").split(".").filter(Boolean);
+      let cur = obj;
+      for(const p of parts){
+        if(p.startsWith("[")){
+          const idx = parseInt(p.slice(1,-1),10);
+          cur = cur?.[idx];
+        } else {
+          cur = cur?.[p];
+        }
+      }
+      return cur;
+    }
+    function guessTagsFromText(text){
+      const t = (text||"").toLowerCase();
+      const tags = new Set();
+      if(/\bceasefire|truce|talks|negotiat|diplomac|summit\b/.test(t)) tags.add("diplomacy");
+      if(/\bdisplace|refugee|evacuat|camp\b/.test(t)) tags.add("displacement");
+      if(/\bhospital|aid|humanitarian|food|water|cholera|shelter\b/.test(t)) tags.add("humanitarian");
+      if(/\bcivilian|children|massacre|school|market\b/.test(t)) tags.add("civilians");
+      if(/\bclash|shell|airstrike|artillery|missile|drone|frontline\b/.test(t)) tags.add("war");
+      return [...tags];
+    }
+
+    /* =========================================================
+       TOOLTIP: Merge + Cluster Logic
+       What it is: Simple clustering to group similar items from multiple sources.
+       What it does: Computes corroboration and divergence.
+       How to extend: Improve similarity with stronger tokenization or geocoding (local).
+       Outcome: Redundancy scoring and divergence flags.
+    ========================================================== */
+    function tokenize(s){
+      return (s||"")
+        .toLowerCase()
+        .replace(/[^a-z0-9\s\-]/g," ")
+        .split(/\s+/)
+        .filter(w => w.length >= 4)
+        .slice(0, 80);
+    }
+    function jaccard(a,b){
+      const A = new Set(a), B = new Set(b);
+      let inter=0;
+      for(const x of A) if(B.has(x)) inter++;
+      const union = A.size + B.size - inter;
+      return union ? inter/union : 0;
+    }
+    function clusterEvents(events){
+      // Each event: {title,time,location,summary,url,tags,source}
+      const clusters = [];
+      for(const ev of events){
+        const tokens = tokenize(ev.title + " " + ev.location + " " + ev.summary);
+        const t = ev.time || 0;
+        let best = null, bestScore = 0;
+
+        for(const c of clusters){
+          // time proximity matters
+          const dt = Math.abs((c.time || t) - t);
+          const timeScore = (ev.time && c.time) ? Math.max(0, 1 - dt/(1000*3600*24*7)) : 0.55; // up to 7 days window
+          const sim = jaccard(tokens, c.tokens);
+          const locSim = jaccard(tokenize(ev.location), tokenize(c.locationHint));
+          const score = 0.55*sim + 0.25*timeScore + 0.20*locSim;
+          if(score > bestScore){ bestScore=score; best=c; }
+        }
+
+        if(best && bestScore >= 0.26){
+          best.items.push(ev);
+          best.tokens = mergeTokens(best.tokens, tokens);
+          best.locationHint = best.locationHint || ev.location || "";
+          best.time = best.time || ev.time || null;
+          best.tags = mergeTags(best.tags, ev.tags);
+        } else {
+          clusters.push({
+            id: "c_" + Safe.hashTokens((ev.title||"") + "|" + (ev.location||"") + "|" + String(ev.time||"")),
+            time: ev.time || null,
+            locationHint: ev.location || "",
+            tokens: new Set(tokens),
+            tags: new Set(ev.tags || []),
+            items: [ev]
+          });
+        }
+      }
+      // finalize
+      return clusters.map(c => {
+        const sources = [...new Set(c.items.map(i=>i.source))];
+        const corroboration = Safe.clamp((sources.length - 1) / 3, 0, 1); // 2+ sources => meaningful
+        const metaQuality = Safe.clamp(
+          (avg(c.items.map(i=> i.url ? 1 : 0))*0.35) +
+          (avg(c.items.map(i=> i.location ? 1 : 0))*0.35) +
+          (avg(c.items.map(i=> i.time ? 1 : 0))*0.30),
+          0,1
+        );
+        // divergence: compare token overlap among items
+        const sims = [];
+        for(let i=0;i<c.items.length;i++){
+          for(let j=i+1;j<c.items.length;j++){
+            sims.push(jaccard(tokenize(c.items[i].title+" "+c.items[i].summary), tokenize(c.items[j].title+" "+c.items[j].summary)));
+          }
+        }
+        const cohesion = sims.length ? avg(sims) : 0.55;
+        const divergence = Safe.clamp(1 - cohesion, 0, 1);
+
+        // confidence: corroboration + metadata - divergence penalty
+        const confidence = Safe.clamp(0.55*corroboration + 0.35*metaQuality + 0.10*(1-divergence), 0, 1);
+
+        return {
+          id: c.id,
+          time: c.time,
+          location: c.locationHint,
+          tags: [...c.tags],
+          items: c.items,
+          sources,
+          corroboration,
+          divergence,
+          confidence
+        };
+      }).sort((a,b) => (b.confidence - a.confidence) || ((b.time||0)-(a.time||0)));
+    }
+    function mergeTokens(set, arr){
+      if(!(set instanceof Set)) set = new Set(set || []);
+      for(const t of arr) set.add(t);
+      return set;
+    }
+    function mergeTags(set, arr){
+      if(!(set instanceof Set)) set = new Set(set || []);
+      for(const t of (arr||[])) set.add(t);
+      return set;
+    }
+    function avg(xs){
+      if(!xs.length) return 0;
+      return xs.reduce((a,b)=>a+b,0)/xs.length;
+    }
+
+    /* =========================================================
+       TOOLTIP: UI State
+       Outcome: Centralizes app state, enables offline caching.
+    ========================================================== */
+    const State = {
+      settings: {
+        offlineCache: true,
+        autoRefresh: true,
+        preferCache: true,
+        localAnalytics: false,
+      },
+      sourceConfig: {}, // per connector fields + enabled
+      lastFetchAt: null,
+      lastMerged: [],
+      lastClusters: [],
+      imported: [],
+      analytics: { refreshes:0, searches:0, actions:0, lastDay: null, streak:0 },
+    };
+
+    /* =========================================================
+       TOOLTIP: DOM Handles
+    ========================================================== */
+    const $ = (id)=>document.getElementById(id);
+    const el = {
+      splash: $("splash"),
+      enterBtn: $("enterBtn"),
+      resetLocalBtn: $("resetLocalBtn"),
+
+      parallaxBg: $("parallaxBg"),
+      refreshBtn: $("refreshBtn"),
+      useCacheBtn: $("useCacheBtn"),
+      exportBtn: $("exportBtn"),
+
+      region: $("region"),
+      window: $("window"),
+      minScore: $("minScore"),
+      topic: $("topic"),
+      sort: $("sort"),
+      maxItems: $("maxItems"),
+      search: $("search"),
+
+      sourceCards: $("sourceCards"),
+      addCustomSourceBtn: $("addCustomSourceBtn"),
+      clearKeysBtn: $("clearKeysBtn"),
+
+      freshnessVal: $("freshnessVal"),
+      divergenceVal: $("divergenceVal"),
+      cacheVal: $("cacheVal"),
+
+      srcOk: $("srcOk"),
+      srcPartial: $("srcPartial"),
+      srcFail: $("srcFail"),
+      mergedCount: $("mergedCount"),
+      clusterCount: $("clusterCount"),
+      highDivCount: $("highDivCount"),
+
+      eventList: $("eventList"),
+      divList: $("divList"),
+
+      constellation: $("constellation"),
+
+      clusterPick: $("clusterPick"),
+      actionLane: $("actionLane"),
+      generatePlanBtn: $("generatePlanBtn"),
+      planBox: $("planBox"),
+      newActionSprintBtn: $("newActionSprintBtn"),
+      logActionBtn: $("logActionBtn"),
+      actionLog: $("actionLog"),
+      clearActionLogBtn: $("clearActionLogBtn"),
+
+      importName: $("importName"),
+      importText: $("importText"),
+      importParseBtn: $("importParseBtn"),
+      importClearBtn: $("importClearBtn"),
+      filePick: $("filePick"),
+
+      offlineCacheToggle: $("offlineCacheToggle"),
+      autoRefreshToggle: $("autoRefreshToggle"),
+      preferCacheToggle: $("preferCacheToggle"),
+      localAnalyticsToggle: $("localAnalyticsToggle"),
+      resetAnalyticsBtn: $("resetAnalyticsBtn"),
+
+      swStatusBtn: $("swStatusBtn"),
+      wipeAllBtn: $("wipeAllBtn"),
+
+      hud: $("hud"),
+      minHudBtn: $("minHudBtn"),
+      pinHudBtn: $("pinHudBtn"),
+      momentumBar: $("momentumBar"),
+      hudActions: $("hudActions"),
+      hudChecks: $("hudChecks"),
+      hudDiverg: $("hudDiverg"),
+      hudStreak: $("hudStreak"),
+      hudQuickAction: $("hudQuickAction"),
+      hudSnapshot: $("hudSnapshot"),
+      hudReset: $("hudReset"),
+    };
+
+    /* =========================================================
+       TOOLTIP: Boot Sequence
+       Outcome: Initializes storage, SW, state, UI.
+    ========================================================== */
+    (async function boot(){
+      await DB.open();
+      await loadAllState();
+      if("serviceWorker" in navigator){
+        await registerSW();
+      }
+      bindUI();
+      renderSources();
+      renderSettings();
+      renderHud();
+      drawConstellation();
+
+      // Fill cluster picker
+      updateClusterPick();
+
+      // Auto refresh if enabled, but gentle (uses limiter)
+      if(State.settings.autoRefresh){
+        setTimeout(() => refreshNow({reason:"auto"}), 550);
+      } else {
+        // show cached if any
+        await useCache();
+      }
+
+      // Splash: respect one-time seen
+      const seen = (await DB.get("settings", "splashSeen"))?.value;
+      if(seen){
+        hideSplash();
+      } else {
+        // stays until user clicks Enter
+      }
+
+      updateHeaderPills();
+    })();
+
+    async function loadAllState(){
+      const s = await DB.get("settings","app")?.catch(()=>null);
+      if(s?.value) Object.assign(State.settings, s.value);
+
+      const sc = await DB.get("sources","config")?.catch(()=>null);
+      if(sc?.value) State.sourceConfig = sc.value;
+
+      const cache = await DB.get("cache","last")?.catch(()=>null);
+      if(cache?.value){
+        State.lastFetchAt = cache.value.lastFetchAt || null;
+        State.lastClusters = cache.value.clusters || [];
+        State.lastMerged = cache.value.merged || [];
+      }
+
+      const imp = await DB.get("imports","data")?.catch(()=>null);
+      if(imp?.value) State.imported = imp.value;
+
+      const act = await DB.all("actions").catch(()=>[]);
+      State.actions = act || [];
+
+      const an = await DB.get("analytics","stats")?.catch(()=>null);
+      if(an?.value) State.analytics = an.value;
+
+      // load custom sources
+      const custom = await DB.get("sources","custom")?.catch(()=>null);
+      if(custom?.value?.length){
+        for(const c of custom.value){
+          // Avoid duplicates
+          if(!CONNECTORS.find(x=>x.id===c.id)){
+            CONNECTORS.push(makeCustomConnector(c));
+          }
+        }
+      }
+    }
+
+    async function persistSettings(){
+      await DB.put("settings", {id:"app", value: State.settings});
+    }
+    async function persistSourceConfig(){
+      await DB.put("sources", {id:"config", value: State.sourceConfig});
+    }
+    async function persistCache(){
+      await DB.put("cache", {id:"last", value: { lastFetchAt: State.lastFetchAt, clusters: State.lastClusters, merged: State.lastMerged }});
+    }
+    async function persistImported(){
+      await DB.put("imports", {id:"data", value: State.imported});
+    }
+    async function persistAnalytics(){
+      await DB.put("analytics", {id:"stats", value: State.analytics});
+    }
+
+    /* =========================================================
+       TOOLTIP: UI Binding
+       Outcome: Wires interactions + rate-limited fetch.
+    ========================================================== */
+    function bindUI(){
+      // Splash controls
+      el.enterBtn.addEventListener("click", async ()=>{
+        await DB.put("settings", {id:"splashSeen", value:true});
+        hideSplash();
+      });
+      el.resetLocalBtn.addEventListener("click", async ()=>{
+        await wipeAllLocal();
+        location.reload();
+      });
+
+      // Parallax
+      window.addEventListener("pointermove", (e)=>{
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 16;
+        el.parallaxBg.style.setProperty("--px", x.toFixed(2)+"px");
+        el.parallaxBg.style.setProperty("--py", y.toFixed(2)+"px");
+      }, {passive:true});
+
+      // Dashboard controls
+      el.refreshBtn.addEventListener("click", ()=>refreshNow({reason:"manual"}));
+      el.useCacheBtn.addEventListener("click", ()=>useCache());
+      el.exportBtn.addEventListener("click", ()=>exportJSON());
+
+      // Filters re-render
+      [el.region, el.window, el.minScore, el.topic, el.sort, el.maxItems].forEach(x=>{
+        x.addEventListener("change", ()=>{
+          saveUIToState();
+          renderFeed();
+          updateClusterPick();
+          updateHeaderPills();
+          drawConstellation();
+        });
+      });
+
+      // Search
+      el.search.addEventListener("input", ()=>{
+        if(State.settings.localAnalytics){
+          State.analytics.searches++;
+          persistAnalytics();
+        }
+        renderFeed();
+      });
+
+      // Sources
+      el.addCustomSourceBtn.addEventListener("click", ()=>addCustomSource());
+      el.clearKeysBtn.addEventListener("click", async ()=>{
+        // Clear stored source config fields that look like keys/tokens
+        for(const k of Object.keys(State.sourceConfig)){
+          for(const f of Object.keys(State.sourceConfig[k]?.fields||{})){
+            if(/key|token|secret/i.test(f)) State.sourceConfig[k].fields[f] = "";
+          }
+        }
+        await persistSourceConfig();
+        renderSources();
+      });
+
+      // Action lab
+      el.generatePlanBtn.addEventListener("click", ()=>generatePeacePlan());
+      el.newActionSprintBtn.addEventListener("click", ()=>startSprint());
+      el.logActionBtn.addEventListener("click", ()=>logActionPrompt());
+      el.clearActionLogBtn.addEventListener("click", ()=>clearActionLog());
+
+      // Import
+      el.importParseBtn.addEventListener("click", ()=>parseImport());
+      el.importClearBtn.addEventListener("click", async ()=>{
+        State.imported = [];
+        await persistImported();
+        toast("Imported dataset cleared.");
+        // re-merge with cache/last if available
+        await useCache();
+      });
+      el.filePick.addEventListener("change", async (e)=>{
+        const file = e.target.files?.[0];
+        if(!file) return;
+        const text = await file.text();
+        el.importText.value = text;
+        el.importName.value = el.importName.value || file.name;
+        toast("Loaded file into import box. Click “Parse & Merge”.");
+      });
+
+      // Settings toggles
+      el.offlineCacheToggle.addEventListener("change", async ()=>{
+        State.settings.offlineCache = el.offlineCacheToggle.checked;
+        await persistSettings();
+        updateHeaderPills();
+      });
+      el.autoRefreshToggle.addEventListener("change", async ()=>{
+        State.settings.autoRefresh = el.autoRefreshToggle.checked;
+        await persistSettings();
+      });
+      el.preferCacheToggle.addEventListener("change", async ()=>{
+        State.settings.preferCache = el.preferCacheToggle.checked;
+        await persistSettings();
+      });
+      el.localAnalyticsToggle.addEventListener("change", async ()=>{
+        State.settings.localAnalytics = el.localAnalyticsToggle.checked;
+        await persistSettings();
+        toast(State.settings.localAnalytics ? "Local-only analytics enabled." : "Local-only analytics disabled.");
+      });
+      el.resetAnalyticsBtn.addEventListener("click", async ()=>{
+        State.analytics = { refreshes:0, searches:0, actions:0, lastDay:null, streak:0 };
+        await persistAnalytics();
+        renderHud();
+        drawConstellation();
+        toast("Local analytics reset.");
+      });
+
+      // SW + wipe
+      el.swStatusBtn.addEventListener("click", ()=>showSWStatus());
+      el.wipeAllBtn.addEventListener("click", ()=>wipeAllLocal());
+
+      // HUD
+      el.minHudBtn.addEventListener("click", ()=>toggleHudMin());
+      el.pinHudBtn.addEventListener("click", ()=>toggleHudMin());
+      el.hudQuickAction.addEventListener("click", ()=>quickLog15());
+      el.hudSnapshot.addEventListener("click", ()=>snapshot());
+      el.hudReset.addEventListener("click", ()=>resetHud());
+
+      makeHudDraggable(el.hud);
+    }
+
+    function hideSplash(){
+      el.splash.classList.add("hide");
+      setTimeout(()=> el.splash.style.display="none", 650);
+    }
+
+    function saveUIToState(){
+      // (Optionally store in settings later)
+    }
+
+    function renderSettings(){
+      el.offlineCacheToggle.checked = !!State.settings.offlineCache;
+      el.autoRefreshToggle.checked = !!State.settings.autoRefresh;
+      el.preferCacheToggle.checked = !!State.settings.preferCache;
+      el.localAnalyticsToggle.checked = !!State.settings.localAnalytics;
+    }
+
+    /* =========================================================
+       TOOLTIP: Source Rendering + Config
+    ========================================================== */
+    function getConnectorConfig(id){
+      if(!State.sourceConfig[id]){
+        State.sourceConfig[id] = { enabled: true, fields: {} };
+      }
+      return State.sourceConfig[id];
+    }
+
+    function renderSources(){
+      const cards = [];
+      for(const c of CONNECTORS){
+        const cfg = getConnectorConfig(c.id);
+        if(cfg.enabled === undefined) cfg.enabled = !!c.enabledByDefault;
+
+        const fieldHtml = (c.fields||[]).map(f=>{
+          const val = cfg.fields?.[f.key] ?? f.def ?? "";
+          if(f.type === "select"){
+            return `
+              <label>${Safe.escape(f.label)}</label>
+              <select data-cid="${Safe.escape(c.id)}" data-field="${Safe.escape(f.key)}" data-kind="select">
+                ${(f.options||[]).map(([v,lab])=>`<option value="${Safe.escape(v)}" ${String(v)===String(val)?"selected":""}>${Safe.escape(lab)}</option>`).join("")}
+              </select>
+            `;
+          }
+          return `
+            <label>${Safe.escape(f.label)}</label>
+            <input data-cid="${Safe.escape(c.id)}" data-field="${Safe.escape(f.key)}" data-kind="text" value="${Safe.escape(val)}" placeholder="${Safe.escape(f.def||"")}" />
+          `;
+        }).join("");
+
+        cards.push(`
+          <div class="card" style="box-shadow:none">
+            <div class="hd">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <div style="font-weight:900">${Safe.escape(c.name)}</div>
+                <div class="tiny muted">${Safe.escape(c.hint || "")}</div>
+              </div>
+              <div class="right">
+                <span class="pill"><b>${Safe.escape(c.kind)}</b></span>
+              </div>
+            </div>
+            <div class="bd">
+              <div class="toggle">
+                <input type="checkbox" data-cid="${Safe.escape(c.id)}" data-kind="enabled" ${cfg.enabled?"checked":""} />
+                <label style="margin:0">Enabled</label>
+              </div>
+              ${fieldHtml ? `<div class="sep"></div>${fieldHtml}` : ""}
+              <div class="sep"></div>
+              <div class="tiny muted">
+                Source ID: <span class="mono">${Safe.escape(c.id)}</span>
+              </div>
+            </div>
+          </div>
+        `);
+      }
+      el.sourceCards.innerHTML = cards.join("");
+
+      // Wire inputs
+      el.sourceCards.querySelectorAll("input[data-cid], select[data-cid]").forEach(inp=>{
+        inp.addEventListener("change", async (e)=>{
+          const cid = inp.getAttribute("data-cid");
+          const kind = inp.getAttribute("data-kind");
+          const cfg = getConnectorConfig(cid);
+          if(kind === "enabled"){
+            cfg.enabled = !!inp.checked;
+          } else {
+            const field = inp.getAttribute("data-field");
+            cfg.fields[field] = inp.value;
+          }
+          await persistSourceConfig();
+        });
+      });
+    }
+
+    async function addCustomSource(){
+      const id = "custom_" + Math.random().toString(16).slice(2,8);
+      const name = prompt("Custom source name (e.g., NGO JSON feed):");
+      if(!name) return;
+      const url = prompt("Endpoint URL (must support CORS):");
+      if(!url) return;
+      const jsonPath = prompt("Optional JSON path to array (e.g., data.items). Leave blank if root is array:", "") || "";
+      const cfg = { id, name, url, jsonPath, enabled:true };
+      const existing = (await DB.get("sources","custom"))?.value || [];
+      existing.push(cfg);
+      await DB.put("sources", {id:"custom", value: existing});
+      CONNECTORS.push(makeCustomConnector(cfg));
+      renderSources();
+      toast("Custom source added.");
+    }
+
+    /* =========================================================
+       TOOLTIP: Fetch + Merge Pipeline
+    ========================================================== */
+    async function refreshNow({reason}){
+      if(!Safe.limiter.allow()){
+        toast("Slow down a bit — rate limiter engaged.");
+        return;
+      }
+      if(State.settings.localAnalytics){
+        State.analytics.refreshes++;
+        updateStreak();
+        persistAnalytics();
+      }
+
+      const params = {
+        windowDays: +el.window.value,
+        query: el.search.value,
+        region: el.region.value,
+      };
+
+      const allEvents = [];
+      let ok=0, partial=0, fail=0;
+
+      for(const c of CONNECTORS){
+        const cfg = getConnectorConfig(c.id);
+        if(!cfg.enabled) continue;
+        try{
+          const items = await c.fetch({
+            ...params,
+            fields: cfg.fields || {}
+          });
+          const normed = items.map(it=>c.normalize(it)).filter(x=>x.title || x.summary);
+          allEvents.push(...normed);
+          ok++;
+        }catch(e){
+          console.warn("Source failed:", c.id, e);
+          fail++;
+        }
+      }
+
+      // Add imported items as another source
+      if(State.imported?.length){
+        const imp = CONNECTORS.find(x=>x.id==="unimport");
+        const normed = State.imported.map(it=>imp.normalize(it));
+        allEvents.push(...normed);
+        partial++;
+      }
+
+      const clusters = clusterEvents(allEvents);
+
+      State.lastFetchAt = Date.now();
+      State.lastMerged = allEvents;
+      State.lastClusters = clusters;
+
+      if(State.settings.offlineCache){
+        await persistCache();
+      }
+
+      updateStats(ok, partial, fail);
+      renderFeed();
+      updateClusterPick();
+      updateHeaderPills();
+      drawConstellation();
+      toast("Refresh complete.");
+    }
+
+    async function useCache(){
+      if(State.lastClusters?.length){
+        renderFeed();
+        updateClusterPick();
+        updateHeaderPills();
+        drawConstellation();
+        toast("Loaded cached results.");
+      } else {
+        toast("No cached data available.");
+      }
+    }
+
+    function updateStats(ok, partial, fail){
+      el.srcOk.textContent = ok;
+      el.srcPartial.textContent = partial;
+      el.srcFail.textContent = fail;
+      el.mergedCount.textContent = State.lastMerged.length;
+      el.clusterCount.textContent = State.lastClusters.length;
+      const highDiv = State.lastClusters.filter(c=>c.divergence >= 0.6).length;
+      el.highDivCount.textContent = highDiv;
+    }
+
+    /* =========================================================
+       TOOLTIP: Rendering Feed
+    ========================================================== */
+    function renderFeed(){
+      const minScore = +el.minScore.value;
+      const topic = el.topic.value;
+      const sort = el.sort.value;
+      const maxItems = +el.maxItems.value;
+      const q = el.search.value.toLowerCase();
+
+      let clusters = State.lastClusters.slice();
+
+      if(topic !== "all"){
+        clusters = clusters.filter(c => c.tags.includes(topic));
+      }
+      clusters = clusters.filter(c => c.confidence >= minScore);
+
+      if(q){
+        clusters = clusters.filter(c =>
+          c.items.some(i =>
+            (i.title+i.summary+i.location).toLowerCase().includes(q)
+          )
+        );
+      }
+
+      if(sort === "time"){
+        clusters.sort((a,b)=>(b.time||0)-(a.time||0));
+      } else if(sort === "div"){
+        clusters.sort((a,b)=>b.divergence-a.divergence);
+      } else {
+        clusters.sort((a,b)=>b.confidence-a.confidence);
+      }
+
+      clusters = clusters.slice(0, maxItems);
+
+      el.eventList.innerHTML = clusters.map(c=>renderCluster(c)).join("") || `<div class="tiny muted">No items match current filters.</div>`;
+
+      el.divList.innerHTML = State.lastClusters
+        .filter(c=>c.divergence>=0.6)
+        .slice(0,5)
+        .map(c=>`<div class="tiny mono">${Safe.escape(c.location||"")} — div ${(c.divergence*100).toFixed(0)}%</div>`)
+        .join("") || "—";
+
+      el.hudDiverg.textContent = clusters.length ? (avg(clusters.map(c=>c.divergence))*100).toFixed(0)+"%" : "—";
+      renderHud();
+    }
+
+    function renderCluster(c){
+      const t = c.time ? new Date(c.time).toLocaleString() : "—";
+      const divTag = c.divergence >= 0.6 ? `<span class="tag bad">High divergence</span>` :
+                     c.divergence >= 0.35 ? `<span class="tag warn">Medium divergence</span>` :
+                     `<span class="tag good">Low divergence</span>`;
+      const conf = (c.confidence*100).toFixed(0)+"%";
+      const items = c.items.slice(0,5).map(i=>`
+        <div class="srcs">
+          <span class="tag">${Safe.escape(i.source)}</span>
+          ${i.url ? `<a href="${Safe.escape(i.url)}" target="_blank" rel="noopener">link</a>`:""}
+        </div>
+      `).join("");
+
+      return `
+        <div class="ev">
+          <div class="top">
+            <div>
+              <div class="ttl">${Safe.escape(c.items[0]?.title || "Untitled")}</div>
+              <div class="meta">${Safe.escape(c.location||"")} • ${t}</div>
+            </div>
+            <div class="score"><b>${conf}</b></div>
+          </div>
+          <div class="desc">${Safe.escape(c.items[0]?.summary || "")}</div>
+          <div class="links">
+            ${divTag}
+            <span class="tag">Sources: ${c.sources.length}</span>
+          </div>
+          ${items}
+        </div>
+      `;
+    }
+
+    /* =========================================================
+       TOOLTIP: Action Lab Logic
+    ========================================================== */
+    function updateClusterPick(){
+      el.clusterPick.innerHTML = State.lastClusters.map(c=>
+        `<option value="${c.id}">${Safe.escape((c.location||"")+" — "+(c.items[0]?.title||""))}</option>`
+      ).join("");
+    }
+
+    function generatePeacePlan(){
+      const cid = el.clusterPick.value;
+      const lane = el.actionLane.value;
+      const c = State.lastClusters.find(x=>x.id===cid);
+      if(!c){
+        el.planBox.textContent = "No cluster selected.";
+        return;
+      }
+      const base = `
+Minimum verified claim: ${c.items.length} sources report related activity.
+Who is most affected: ${c.tags.includes("civilians")?"Civilians":"Unclear"}.
+Risk-aware next step: `;
+      const plans = {
+        aid: "Identify one reputable humanitarian org active here and donate or share their vetted appeal.",
+        narrative: "Share one careful summary citing at least two sources, avoiding inflammatory language.",
+        civic: "Contact a representative with a concise, evidence-linked request focused on de-escalation.",
+        empathy: "Amplify a human story that avoids blame and emphasizes shared humanity.",
+        local: "Support a local refugee or aid initiative connected to this region."
+      };
+      el.planBox.textContent = base + plans[lane];
+    }
+
+    function startSprint(){
+      toast("7-day sprint started (local-only). Pick one small action per day.");
+    }
+
+    function logActionPrompt(){
+      const note = prompt("Describe the action you took (15–100 words):");
+      if(!note) return;
+      logAction(note);
+    }
+
+    function quickLog15(){
+      logAction("Completed a 15-minute peace-support action.");
+    }
+
+    function logAction(note){
+      const id = "a_"+Date.now();
+      DB.put("actions",{id, note, time:Date.now()});
+      State.analytics.actions++;
+      updateStreak();
+      persistAnalytics();
+      renderActionLog();
+      renderHud();
+      drawConstellation();
+      toast("Action logged.");
+    }
+
+    function clearActionLog(){
+      DB.all("actions").then(list=>{
+        list.forEach(a=>DB.del("actions",a.id));
+        renderActionLog();
+        toast("Action log cleared.");
+      });
+    }
+
+    function renderActionLog(){
+      DB.all("actions").then(list=>{
+        if(!list.length){
+          el.actionLog.textContent = "No actions logged yet.";
+          return;
+        }
+        el.actionLog.innerHTML = list
+          .sort((a,b)=>b.time-a.time)
+          .map(a=>`<div>• ${new Date(a.time).toLocaleDateString()}: ${Safe.escape(a.note)}</div>`)
+          .join("");
+      });
+    }
+
+    /* =========================================================
+       TOOLTIP: Import Parsing
+    ========================================================== */
+    function parseImport(){
+      const name = el.importName.value || "Import";
+      const text = el.importText.value.trim();
+      if(!text){ toast("Nothing to parse."); return; }
+
+      let items=[];
+      try{
+        if(text.startsWith("[") || text.startsWith("{")){
+          const j = JSON.parse(text);
+          items = Array.isArray(j)? j : (Array.isArray(j.items)? j.items : []);
+        } else {
+          // CSV (very simple)
+          const lines = text.split(/\r?\n/).filter(Boolean);
+          const headers = lines.shift().split(",").map(h=>h.trim());
+          items = lines.map(l=>{
+            const vals = l.split(",");
+            const o={};
+            headers.forEach((h,i)=>o[h]=vals[i]);
+            return o;
+          });
+        }
+      }catch(e){
+        toast("Parse failed. Check JSON/CSV format.");
+        return;
+      }
+
+      items = items.map(it=>({...it, source:name}));
+      State.imported = items;
+      persistImported();
+      toast("Import parsed. Refresh or Use Cache to merge.");
+    }
+
+    /* =========================================================
+       TOOLTIP: Header + HUD + Constellation
+    ========================================================== */
+    function updateHeaderPills(){
+      el.freshnessVal.textContent = State.lastFetchAt ? new Date(State.lastFetchAt).toLocaleTimeString() : "—";
+      const div = State.lastClusters.length ? (avg(State.lastClusters.map(c=>c.divergence))*100).toFixed(0)+"%" : "—";
+      el.divergenceVal.textContent = div;
+      el.cacheVal.textContent = State.settings.offlineCache ? "On" : "Off";
+    }
+
+    function renderHud(){
+      el.hudActions.textContent = State.analytics.actions || 0;
+      el.hudChecks.textContent = State.analytics.refreshes || 0;
+      el.hudStreak.textContent = State.analytics.streak || 0;
+      const momentum = Safe.clamp((State.analytics.actions||0)*5, 0, 100);
+      el.momentumBar.style.setProperty("--w", momentum+"%");
+    }
+
+    function updateStreak(){
+      const today = new Date().toDateString();
+      if(State.analytics.lastDay !== today){
+        State.analytics.streak = (State.analytics.lastDay ? State.analytics.streak+1 : 1);
+        State.analytics.lastDay = today;
+      }
+    }
+
+    function drawConstellation(){
+      const ctx = el.constellation.getContext("2d");
+      const w = el.constellation.width, h = el.constellation.height;
+      ctx.clearRect(0,0,w,h);
+
+      const nodes = [
+        {x:0.2,y:0.5,r:6,label:"Fresh"},
+        {x:0.5,y:0.3,r:6,label:"Divergence"},
+        {x:0.8,y:0.5,r:6,label:"Sources"},
+        {x:0.5,y:0.7,r:6,label:"Actions"},
+      ];
+      ctx.strokeStyle="rgba(124,247,197,.5)";
+      ctx.fillStyle="rgba(124,247,197,.9)";
+      ctx.beginPath();
+      nodes.forEach((n,i)=>{
+        const nx=n.x*w, ny=n.y*h;
+        ctx.moveTo(nx,ny);
+        const m=nodes[(i+1)%nodes.length];
+        ctx.lineTo(m.x*w,m.y*h);
+      });
+      ctx.stroke();
+      nodes.forEach(n=>{
+        ctx.beginPath();
+        ctx.arc(n.x*w,n.y*h,n.r,0,Math.PI*2);
+        ctx.fill();
+      });
+    }
+
+    function toggleHudMin(){
+      el.hud.classList.toggle("min");
+    }
+
+    function makeHudDraggable(hud){
+      let x=0,y=0,drag=false;
+      hud.addEventListener("pointerdown",e=>{drag=true;x=e.clientX;y=e.clientY;hud.setPointerCapture(e.pointerId);});
+      hud.addEventListener("pointermove",e=>{
+        if(!drag) return;
+        const dx=e.clientX-x, dy=e.clientY-y;
+        const r=hud.getBoundingClientRect();
+        hud.style.right="auto";
+        hud.style.bottom="auto";
+        hud.style.left=(r.left+dx)+"px";
+        hud.style.top=(r.top+dy)+"px";
+        x=e.clientX;y=e.clientY;
+      });
+      hud.addEventListener("pointerup",()=>drag=false);
+    }
+
+    function snapshot(){
+      const data = { time:Date.now(), clusters:State.lastClusters.length, actions:State.analytics.actions };
+      toast("Snapshot taken (local).");
+    }
+
+    function resetHud(){
+      State.analytics = { refreshes:0, searches:0, actions:0, lastDay:null, streak:0 };
+      persistAnalytics();
+      renderHud();
+      drawConstellation();
+      toast("HUD reset.");
+    }
+
+    function exportJSON(){
+      const blob = new Blob([JSON.stringify(State.lastClusters,null,2)],{type:"application/json"});
+      const a = document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="conflict_redundancy_export.json";
+      a.click();
+    }
+
+    function showSWStatus(){
+      navigator.serviceWorker.getRegistrations().then(r=>{
+        toast(r.length ? "Service worker active." : "No service worker registered.");
+      });
+    }
+
+    async function wipeAllLocal(){
+      await DB.wipeAll();
+      toast("All local data wiped.");
+    }
+
+    function toast(msg){
+      const d=document.createElement("div");
+      d.textContent=msg;
+      d.style.position="fixed";
+      d.style.left="50%";
+      d.style.bottom="20px";
+      d.style.transform="translateX(-50%)";
+      d.style.background="rgba(0,0,0,.8)";
+      d.style.color="#fff";
+      d.style.padding="8px 12px";
+      d.style.borderRadius="12px";
+      d.style.zIndex=200;
+      document.body.appendChild(d);
+      setTimeout(()=>d.remove(),2200);
+    }
+  </script>
+</body>
+</html>
+
